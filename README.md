@@ -23,7 +23,7 @@ TODO.
 
 ## Licence
 
-[MIT](https://github.com/lpre-ys/tk2k-message-assist/master/LICENCE)
+[MIT](https://github.com/lpre-ys/tk2k-message-assist/blob/master/LICENSE)
 
 ## Author
 
