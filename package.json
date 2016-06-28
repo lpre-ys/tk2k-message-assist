@@ -1,0 +1,31 @@
+{
+  "name": "tk2k-message-assist",
+  "version": "0.0.1",
+  "description": "tk2k-message-assist ====",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --harmony",
+    "test-watch": "mocha --harmony -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lpre-ys/tk2k-message-assist.git"
+  },
+  "keywords": [
+    "tk2k"
+  ],
+  "author": "lpre",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lpre-ys/tk2k-message-assist/issues"
+  },
+  "homepage": "https://github.com/lpre-ys/tk2k-message-assist#readme",
+  "devDependencies": {
+    "mocha": "^2.5.3",
+    "power-assert": "^1.4.1"
+  },
+  "dependencies": {
+    "js-yaml": "^3.6.1",
+    "xmldom": "^0.1.22"
+  }
+}
