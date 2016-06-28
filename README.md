@@ -3,7 +3,7 @@ tk2k-message-assist
 
 Overview
 
-TODO.
+読みやすいテキストフォーマットのシナリオをtkool bridgeで扱えるテキストに変換します。
 
 <!---
 ## Description
