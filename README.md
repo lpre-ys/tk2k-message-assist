@@ -1,8 +1,6 @@
 tk2k-message-assist
 ====
 
-Overview
-
 読みやすいテキストフォーマットのシナリオをtkool bridgeで扱えるテキストに変換します。
 
 <!---
