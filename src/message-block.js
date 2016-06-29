@@ -1,4 +1,4 @@
-class MessageList {
+export default class MessageBlock {
   constructor(face) {
     this.face = face;
     this.messageList = [];
@@ -10,5 +10,3 @@ class MessageList {
     return this.messageList.length > 0;
   }
 }
-
-module.exports = MessageList;

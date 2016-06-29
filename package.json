@@ -2,10 +2,11 @@
   "name": "tk2k-message-assist",
   "version": "0.0.1",
   "description": "tk2k-message-assist ====",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
-    "test": "mocha --harmony",
-    "test-watch": "mocha --harmony -w"
+    "test": "npm run build && mocha --compilers js:espower-babel/guess test/**/*.js",
+    "build": "babel src --out-dir lib  --source-maps-inline",
+    "watch": "babel src --out-dir lib --watch --source-maps-inline"
   },
   "repository": {
     "type": "git",
@@ -14,13 +15,16 @@
   "keywords": [
     "tk2k"
   ],
-  "author": "lpre",
+  "author": "lpre-ys",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/lpre-ys/tk2k-message-assist/issues"
   },
   "homepage": "https://github.com/lpre-ys/tk2k-message-assist#readme",
   "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0",
+    "espower-babel": "^4.0.3",
     "mocha": "^2.5.3",
     "power-assert": "^1.4.1"
   },

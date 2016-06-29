@@ -1,12 +1,12 @@
-const assert = require('power-assert');
-const TextParser = require('../lib/TextParser');
+import assert from 'power-assert';
+import ScenarioParser from '../lib/scenario-parser';
 
-describe('TextParser', () => {
+describe('ScenarioParser', () => {
   let parser;
   describe('noFace', () => {
     describe('max line 2', () => {
       beforeEach(() => {
-        parser = new TextParser(2);
+        parser = new ScenarioParser(2);
       });
       describe('1 line text', () => {
         it('normal', () => {

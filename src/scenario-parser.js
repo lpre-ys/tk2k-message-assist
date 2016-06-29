@@ -1,10 +1,8 @@
-'use strict';
+import Message from './message';
+import MessageBlock from './message-block';
+import jsyaml from 'js-yaml';
 
-const Message = require('./Message');
-const MessageBlock = require('./MessageBlock');
-const jsyaml = require('js-yaml');
-
-class TextParser {
+export default class ScenarioParser {
   constructor(viewLineLimit, isUseFace = false) {
     this.viewLineLimit = viewLineLimit;
     this.continueTag = '';
@@ -126,5 +124,3 @@ class TextParser {
 
 // 単独タグ正規表現
 const noEndTagRegExp = /<([a-z]+) \/>/g;
-
-module.exports = TextParser;

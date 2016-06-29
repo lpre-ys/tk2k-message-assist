@@ -1,10 +1,10 @@
-const assert = require('power-assert');
-const TextParser = require('../lib/TextParser');
+import assert from 'power-assert';
+import ScenarioParser from '../lib/scenario-parser';
 
-describe('TextParser', () => {
+describe('ScenarioParser', () => {
   let parser;
   beforeEach(() => {
-    parser = new TextParser(2);
+    parser = new ScenarioParser(2);
   });
   describe('_loadConfig', () => {
     it('color only', () => {

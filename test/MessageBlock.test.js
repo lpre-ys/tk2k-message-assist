@@ -1,5 +1,5 @@
-const assert = require('power-assert');
-const MessageBlock = require('../lib/MessageBlock');
+import assert from 'power-assert';
+import MessageBlock from '../lib/message-block';
 
 describe('MessageBlock', () => {
   it('hasMessage true', () => {
