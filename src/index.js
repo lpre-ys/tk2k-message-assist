@@ -1,4 +1,4 @@
-import ScenarioParser from './lib/scenario-parser';
+import ScenarioParser from './scenario-parser';
 
 module.exports = {
   ScenarioParser
