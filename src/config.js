@@ -24,6 +24,10 @@ export default class Config {
     return this._config.style.display.lineLimit;
   }
 
+  get colors() {
+    return this._config.color;
+  }
+
   getFace(faceKey) {
     if (!this.hasFace) {
       return false;
