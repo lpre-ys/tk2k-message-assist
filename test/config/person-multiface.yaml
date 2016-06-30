@@ -1,0 +1,13 @@
+person:
+  混合:
+    color: skyblue
+    faces:
+      テスト１:
+        name: テスト１
+        filename: test.png
+        number: 1
+      テスト２:
+        name: テスト２
+        color: red
+        filename: test.png
+        number: 2

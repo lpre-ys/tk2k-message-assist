@@ -7,11 +7,13 @@ describe('Config', () => {
   let baseyaml;
   let personYaml1;
   let personYaml2;
+  let personMultiFace;
   beforeEach(() => {
     config = new Config();
     baseyaml = fs.readFileSync('./test/config/style.yaml');
     personYaml1 = fs.readFileSync('./test/config/person1.yaml');
     personYaml2 = fs.readFileSync('./test/config/person2.yaml');
+    personMultiFace = fs.readFileSync('./test/config/person-multiface.yaml');
   });
 
   describe('get', () => {
@@ -49,6 +51,16 @@ describe('Config', () => {
       assert(face.filename == 'test1.png');
       assert(face.number == '1');
       assert(face.name == '<yellow>【テスト１】</yellow>');
+    });
+    it('multi face in one img', () => {
+      config.loadPersonYaml(personMultiFace);
+
+      const face = config.getFace('混合_テスト１');
+
+      assert(face.filename == 'test.png');
+      assert(face.number == '1');
+      assert(face.name == '<skyblue>【テスト１】</skyblue>');
+
     });
   });
 
