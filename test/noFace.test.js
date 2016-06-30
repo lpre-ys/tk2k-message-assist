@@ -1,12 +1,14 @@
 import assert from 'power-assert';
-import ScenarioParser from '../lib/scenario-parser';
+import fs from 'fs';
+import ScenarioParser from '../src/scenario-parser';
 
 describe('ScenarioParser', () => {
   let parser;
   describe('noFace', () => {
     describe('max line 2', () => {
       beforeEach(() => {
-        parser = new ScenarioParser(2);
+        const style = fs.readFileSync('./test/config/style.yaml');
+        parser = new ScenarioParser(style);
       });
       describe('1 line text', () => {
         it('normal', () => {

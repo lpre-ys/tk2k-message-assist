@@ -1,44 +1,21 @@
 import assert from 'power-assert';
-import ScenarioParser from '../lib/scenario-parser';
+import fs from 'fs';
+import ScenarioParser from '../src/scenario-parser';
 
 describe('ScenarioParser', () => {
   let parser;
   describe('useFace', () => {
     beforeEach(() => {
-      parser = new ScenarioParser(2, true);
-      parser._loadConfig(`
-style:
-  display:
-    name:
-      prefix: '【'
-      suffix: '】'
-      colorScope: 'outer'
-  template:
-    face:
-      prefix: '_'
-      suffix: ''
-color:
-  yellow: 3
-  red: 4
-`);
-      parser._loadPerson(`
-person:
-  test:
-    name: テスト
-    color: yellow
-    faces:
-      normal:
-        filename: test1.png
-        number: 1
-      smile:
-        filename: test1.png
-        number: 2
-`);
+      const style = fs.readFileSync('./test/config/style.yaml');
+      const person = [];
+      person.push(fs.readFileSync('./test/config/person1.yaml'));
+      person.push(fs.readFileSync('./test/config/person2.yaml'));
+      parser = new ScenarioParser(style, person);
     });
     describe('1face', () => {
       let ret;
       beforeEach(() => {
-        const text = `test_normal
+        const text = `[テスト君_普通]
         テストメッセージです。`;
         ret = parser.parse(text);
       });
@@ -47,7 +24,7 @@ person:
         const block = ret[0];
         assert(block.face.filename == 'test1.png');
         assert(block.face.number == 1);
-        assert(block.face.name == '<yellow>【テスト】</yellow>');
+        assert(block.face.name == '<yellow>【テスト１】</yellow>');
       });
       it('message', () => {
         const block = ret[0];
@@ -57,9 +34,9 @@ person:
     describe('2face 1line', () => {
       let ret;
       beforeEach(() => {
-        const text = `test_normal
+        const text = `[テスト君_普通]
         テストメッセージです。
-        test_smile
+        [テスト君_笑]
         スマイルメッセージ`;
         ret = parser.parse(text);
       });
@@ -68,11 +45,11 @@ person:
         const block1 = ret[0];
         assert(block1.face.filename == 'test1.png');
         assert(block1.face.number == 1);
-        assert(block1.face.name == '<yellow>【テスト】</yellow>');
+        assert(block1.face.name == '<yellow>【テスト１】</yellow>');
         const block2 = ret[1];
         assert(block2.face.filename == 'test1.png');
         assert(block2.face.number == 2);
-        assert(block2.face.name == '<yellow>【テスト】</yellow>');
+        assert(block2.face.name == '<yellow>【テスト１】</yellow>');
       });
       it('message', () => {
         const block1 = ret[0];
@@ -84,11 +61,11 @@ person:
     describe('2face multi line', () => {
       let ret;
       beforeEach(() => {
-        const text = `test_normal
+        const text = `[テスト君_普通]
         テストメッセージです。
         テストメッセージ2
         テストメッセージ3
-        test_smile
+        [テスト君_笑]
         スマイルメッセージ1
         スマイルメッセージ2
         スマイルメッセージ3
@@ -103,11 +80,11 @@ person:
         const block1 = ret[0];
         assert(block1.face.filename == 'test1.png');
         assert(block1.face.number == 1);
-        assert(block1.face.name == '<yellow>【テスト】</yellow>');
+        assert(block1.face.name == '<yellow>【テスト１】</yellow>');
         const block2 = ret[1];
         assert(block2.face.filename == 'test1.png');
         assert(block2.face.number == 2);
-        assert(block2.face.name == '<yellow>【テスト】</yellow>');
+        assert(block2.face.name == '<yellow>【テスト１】</yellow>');
       });
       it('message', () => {
         const block1 = ret[0];

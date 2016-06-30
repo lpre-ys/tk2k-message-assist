@@ -1,13 +1,20 @@
 import Message from './message';
 import MessageBlock from './message-block';
-import jsyaml from 'js-yaml';
+import Config from './config';
+
+// 単独タグ正規表現
+const noEndTagRegExp = /<([a-z]+) \/>/g;
+// 顔グラ変更命令正規表現
+const faceCommandRegExp = /^\[([^\]]+)]$/;
 
 export default class ScenarioParser {
-  constructor(viewLineLimit, isUseFace = false) {
-    this.viewLineLimit = viewLineLimit;
+  constructor(style, faces = []) {
     this.continueTag = '';
-    this.config = {};
-    this.isUseFace = isUseFace;
+    this.config = new Config();
+    this.config.loadStyleYaml(style);
+    faces.forEach((face) => {
+      this.config.loadPersonYaml(face);
+    });
   }
   parse(input) {
     // trimと配列化
@@ -20,23 +27,26 @@ export default class ScenarioParser {
     let tmp = [];
     let block = new MessageBlock(false);
     textList.forEach((text) => {
-      if (this.isUseFace) {
-        // 顔の判別
-        if (Object.keys(this.config.face).includes(text)) {
-          // メッセージブロックの作り直し
-          if (tmp.length > 0) {
-            block.addMessage(this._tagFormat(tmp));
-            tmp = [];
-          }
-          if (block.hasMessage()) {
-            result.push(block);
-          }
-          block = new MessageBlock(this.config.face[text]);
-          return; //continue
+      if (this.config.hasFace && faceCommandRegExp.test(text)) {
+        // 顔グラ変更
+        const faceCommand = text.substr(1, text.length -2);
+        const faceConfig = this.config.getFace(faceCommand);
+        if (!faceConfig) {
+          throw new Error(`未知の顔グラフィックです。：${faceCommand}`);
         }
+        // メッセージブロックの作り直し
+        if (tmp.length > 0) {
+          block.addMessage(this._tagFormat(tmp));
+          tmp = [];
+        }
+        if (block.hasMessage()) {
+          result.push(block);
+        }
+        block = new MessageBlock(faceConfig);
+        return; //continue
       }
       tmp.push(text);
-      if (tmp.length == this.viewLineLimit) {
+      if (tmp.length == this.config.lineLimit) {
         block.addMessage(this._tagFormat(tmp));
         tmp = [];
       }
@@ -49,46 +59,6 @@ export default class ScenarioParser {
     }
 
     return result;
-  }
-
-  _loadConfig(yaml) {
-    const yamlObj = jsyaml.load(yaml);
-    // 色設定はそのまま読み込む
-    this.config.color = yamlObj.color ? yamlObj.color : false;
-    // スタイル設定はそのまま読み込む
-    this.config.style = yamlObj.style ? yamlObj.style : false;
-    // 顔設定の初期化
-    this.config.face = {};
-  }
-
-  _loadPerson(yaml) {
-    const yamlObj = jsyaml.load(yaml);
-    if (yamlObj.person) {
-      if (!this.config.style) {
-        // スタイル設定が無い場合、エラー
-        throw new Error('スタイル設定が足りてません');
-      }
-      Object.keys(yamlObj.person).forEach((name) => {
-        const person = yamlObj.person[name];
-        Object.keys(person.faces).forEach((faceName) => {
-          const face = person.faces[faceName];
-          const templateConfig = this.config.style.template.face;
-          const nameConfig = this.config.style.display.name;
-          const faceKey = `${name}${templateConfig.prefix}${faceName}${templateConfig.suffix}`;
-          let displayName;
-          if (nameConfig.colorScope == 'inner') {
-            displayName = `${nameConfig.prefix}<${person.color}>${person.name}</${person.color}>${nameConfig.suffix}`;
-          } else if (nameConfig.colorScope == 'outer') {
-            displayName = `<${person.color}>${nameConfig.prefix}${person.name}${nameConfig.suffix}</${person.color}>`;
-          } else {
-            displayName = person.name;
-          }
-          this.config.face[faceKey] = Object.assign({
-            'name': displayName
-          }, face);
-        });
-      });
-    }
   }
 
   _tagFormat(textList) {
@@ -121,6 +91,3 @@ export default class ScenarioParser {
     return new Message(output.trim().split("\n"));
   }
 }
-
-// 単独タグ正規表現
-const noEndTagRegExp = /<([a-z]+) \/>/g;

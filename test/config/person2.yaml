@@ -1,0 +1,11 @@
+person:
+  テスト2君:
+    name: テスト２
+    color: red
+    faces:
+      普通:
+        filename: test2.png
+        number: 1
+      笑:
+        filename: test2.png
+        number: 2

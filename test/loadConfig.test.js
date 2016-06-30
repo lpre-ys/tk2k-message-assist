@@ -1,22 +1,68 @@
 import assert from 'power-assert';
-import ScenarioParser from '../lib/scenario-parser';
+import Config from '../src/config';
+import fs from 'fs';
 
-describe('ScenarioParser', () => {
-  let parser;
+describe('Config', () => {
+  let config;
+  let baseyaml;
+  let personYaml1;
+  let personYaml2;
   beforeEach(() => {
-    parser = new ScenarioParser(2);
+    config = new Config();
+    baseyaml = fs.readFileSync('./test/config/style.yaml');
+    personYaml1 = fs.readFileSync('./test/config/person1.yaml');
+    personYaml2 = fs.readFileSync('./test/config/person2.yaml');
   });
-  describe('_loadConfig', () => {
+
+  describe('get', () => {
+    beforeEach(() => {
+      config.loadStyleYaml(baseyaml);
+    });
+    it('lineLimit', () => {
+      assert(config.lineLimit, 2);
+    });
+    describe('hasFace', () => {
+      it('true', () => {
+        config.loadPersonYaml(personYaml1);
+        assert(config.hasFace === true);
+      });
+      it('false', () => {
+        assert(config.hasFace === false);
+      });
+    });
+    it('faceKeyList', () => {
+      config.loadPersonYaml(personYaml1);
+      config.loadPersonYaml(personYaml2);
+
+      assert.equal(config.faceKeyList.length, 4);
+      assert(config.faceKeyList.includes('テスト君_普通'));
+      assert(config.faceKeyList.includes('テスト君_笑'));
+      assert(config.faceKeyList.includes('テスト2君_普通'));
+      assert(config.faceKeyList.includes('テスト2君_笑'));
+    });
+    it('getFace', () => {
+      config.loadPersonYaml(personYaml1);
+      config.loadPersonYaml(personYaml2);
+
+      const face = config.getFace('テスト君_普通');
+
+      assert(face.filename == 'test1.png');
+      assert(face.number == '1');
+      assert(face.name == '<yellow>【テスト１】</yellow>');
+    });
+  });
+
+  describe('loadYamlConfig', () => {
     it('color only', () => {
       const yaml = `color:
   yellow: 3
   red: 4`;
-      parser._loadConfig(yaml);
+      config.loadStyleYaml(yaml);
 
-      assert.equal(parser.config.color.yellow, '3');
-      assert.equal(parser.config.color.red, '4');
-      assert.equal(parser.config.style, false);
-      assert.deepEqual(parser.config.face, {});
+      assert.equal(config._config.color.yellow, '3');
+      assert.equal(config._config.color.red, '4');
+      assert.equal(config._config.style, false);
+      assert.deepEqual(config._config.face, {});
     });
     it('style only', () => {
       const yaml = `style:
@@ -24,72 +70,38 @@ describe('ScenarioParser', () => {
     name:
       prefix: '【'
       suffix: '】'
+    lineLimit: 4
   template:
     face:
       prefix: '('
       suffix: ')'`;
-      parser._loadConfig(yaml);
+      config.loadStyleYaml(yaml);
 
-      assert.equal(parser.config.style.display.name.prefix, '【');
-      assert.equal(parser.config.style.display.name.suffix, '】');
-      assert.equal(parser.config.style.template.face.prefix, '(');
-      assert.equal(parser.config.style.template.face.suffix, ')');
-      assert.equal(parser.config.color, false);
-      assert.deepEqual(parser.config.face, {});
+      assert.equal(config._config.style.display.name.prefix, '【');
+      assert.equal(config._config.style.display.name.suffix, '】');
+      assert.equal(config._config.style.template.face.prefix, '(');
+      assert.equal(config._config.style.template.face.suffix, ')');
+      assert.equal(config._config.color, false);
+      assert.deepEqual(config._config.face, {});
     });
     it('person', () => {
-      const baseyaml = `style:
-  display:
-    name:
-      prefix: '【'
-      suffix: '】'
-      colorScope: 'outer'
-  template:
-    face:
-      prefix: '('
-      suffix: ')'
-color:
-  yellow: 3
-  red: 4`;
-      const personYaml1 = `person:
-  テスト君:
-    name: テスト１
-    color: yellow
-    faces:
-      普通:
-        filename: test1.png
-        number: 1
-      笑:
-        filename: test1.png
-        number: 2`;
-      const personYaml2 = `person:
-  テスト2君:
-    name: テスト２
-    color: red
-    faces:
-      普通:
-        filename: test2.png
-        number: 1
-      笑:
-        filename: test2.png
-        number: 2`;
-      parser._loadConfig(baseyaml);
+      config.loadStyleYaml(baseyaml);
 
-      parser._loadPerson(personYaml1);
-      parser._loadPerson(personYaml2);
+      config.loadPersonYaml(personYaml1);
+      config.loadPersonYaml(personYaml2);
 
-      assert.equal(parser.config.face['テスト君(普通)'].name, '<yellow>【テスト１】</yellow>');
-      assert.equal(parser.config.face['テスト君(普通)'].filename, 'test1.png');
-      assert.equal(parser.config.face['テスト君(普通)'].number, '1');
-      assert.equal(parser.config.face['テスト君(笑)'].name, '<yellow>【テスト１】</yellow>');
-      assert.equal(parser.config.face['テスト君(笑)'].filename, 'test1.png');
-      assert.equal(parser.config.face['テスト君(笑)'].number, '2');
-      assert.equal(parser.config.face['テスト2君(普通)'].name, '<red>【テスト２】</red>');
-      assert.equal(parser.config.face['テスト2君(普通)'].filename, 'test2.png');
-      assert.equal(parser.config.face['テスト2君(普通)'].number, '1');
-      assert.equal(parser.config.face['テスト2君(笑)'].name, '<red>【テスト２】</red>');
-      assert.equal(parser.config.face['テスト2君(笑)'].filename, 'test2.png');
-      assert.equal(parser.config.face['テスト2君(笑)'].number, '2');
+      assert.equal(config._config.face['テスト君_普通'].name, '<yellow>【テスト１】</yellow>');
+      assert.equal(config._config.face['テスト君_普通'].filename, 'test1.png');
+      assert.equal(config._config.face['テスト君_普通'].number, '1');
+      assert.equal(config._config.face['テスト君_笑'].name, '<yellow>【テスト１】</yellow>');
+      assert.equal(config._config.face['テスト君_笑'].filename, 'test1.png');
+      assert.equal(config._config.face['テスト君_笑'].number, '2');
+      assert.equal(config._config.face['テスト2君_普通'].name, '<red>【テスト２】</red>');
+      assert.equal(config._config.face['テスト2君_普通'].filename, 'test2.png');
+      assert.equal(config._config.face['テスト2君_普通'].number, '1');
+      assert.equal(config._config.face['テスト2君_笑'].name, '<red>【テスト２】</red>');
+      assert.equal(config._config.face['テスト2君_笑'].filename, 'test2.png');
+      assert.equal(config._config.face['テスト2君_笑'].number, '2');
     });
   });
 });
