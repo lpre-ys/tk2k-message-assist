@@ -56,11 +56,14 @@ export default class Config {
           const templateConfig = this._config.style.template.face;
           const nameConfig = this._config.style.display.name;
           const faceKey = `${name}${templateConfig.prefix}${faceName}${templateConfig.suffix}`;
+          const color = face.color || person.color || false;
           let displayName = face.name || person.name;
-          if (nameConfig.colorScope == 'inner') {
-            displayName = `${nameConfig.prefix}<${person.color}>${displayName}</${person.color}>${nameConfig.suffix}`;
-          } else if (nameConfig.colorScope == 'outer') {
-            displayName = `<${person.color}>${nameConfig.prefix}${displayName}${nameConfig.suffix}</${person.color}>`;
+          if (color && nameConfig.colorScope == 'inner') {
+            displayName = `${nameConfig.prefix}<${color}>${displayName}</${color}>${nameConfig.suffix}`;
+          } else if (color && nameConfig.colorScope == 'outer') {
+            displayName = `<${color}>${nameConfig.prefix}${displayName}${nameConfig.suffix}</${color}>`;
+          } else {
+            displayName = `${nameConfig.prefix}${displayName}${nameConfig.suffix}`;
           }
           face.name = displayName;
           this._config.face[faceKey] = face;

@@ -55,11 +55,15 @@ describe('Config', () => {
     it('multi face in one img', () => {
       config.loadPersonYaml(personMultiFace);
 
-      const face = config.getFace('混合_テスト１');
+      const face1 = config.getFace('混合_テスト１');
+      assert(face1.filename == 'test.png');
+      assert(face1.number == '1');
+      assert(face1.name == '<skyblue>【テスト１】</skyblue>');
 
-      assert(face.filename == 'test.png');
-      assert(face.number == '1');
-      assert(face.name == '<skyblue>【テスト１】</skyblue>');
+      const face2 = config.getFace('混合_テスト２');
+      assert(face2.filename == 'test.png');
+      assert(face2.number == '2');
+      assert(face2.name == '<red>【テスト２】</red>');
 
     });
   });

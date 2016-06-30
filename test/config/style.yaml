@@ -9,6 +9,6 @@ style:
     face:
       prefix: '_'
       suffix: ''
-  color:
-    yellow: 3
-    red: 4
+color:
+  yellow: 3
+  red: 4
