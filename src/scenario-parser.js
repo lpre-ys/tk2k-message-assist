@@ -22,6 +22,9 @@ export default class ScenarioParser {
       return value.trim();
     });
 
+    // 継続タグの初期化
+    this.continuetag = '';
+
     // limit別に分ける
     const result = [];
     let tmp = [];
@@ -83,15 +86,12 @@ export default class ScenarioParser {
     }
     if (stack.length > 0) {
       let prev = '';
-      console.log('stack', stack);
       this.continueTag = stack.filter((v) => {
         if (prev != v) {
           prev = v;
           return true;
         }
       }).map((v) => { return `<${v}>`; }).join('');
-      console.log('stack.filter after', stack);
-      console.log('nextCTag', this.continueTag);
     }
 
     // 最終出力
