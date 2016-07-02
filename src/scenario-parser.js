@@ -73,7 +73,7 @@ export default class ScenarioParser {
           // 閉じタグ
           const lastTag = stack.pop(tag);
           if (lastTag != tag.substr(2, tag.length - 3)) {
-            throw new Error('タグの対応がおかしいです。');
+            throw new Error(`タグの対応がおかしいです。: ${lastTag}`);
           }
         } else {
           // 開始タグ
@@ -82,7 +82,16 @@ export default class ScenarioParser {
       });
     }
     if (stack.length > 0) {
-      this.continueTag = stack.map((v) => { return `<${v}>`; }).join('');
+      let prev = '';
+      console.log('stack', stack);
+      this.continueTag = stack.filter((v) => {
+        if (prev != v) {
+          prev = v;
+          return true;
+        }
+      }).map((v) => { return `<${v}>`; }).join('');
+      console.log('stack.filter after', stack);
+      console.log('nextCTag', this.continueTag);
     }
 
     // 最終出力

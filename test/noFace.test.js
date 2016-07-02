@@ -114,6 +114,17 @@ describe('ScenarioParser', () => {
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2 RED-END</red> normal message']);
           });
+          it('3 line, same tag', () => {
+            const text = `Test message <red>RED-START
+            Test message 2 <red>2nd RED-START
+            Test message 3 END`;
+            const ret = parser.parse(text);
+
+            const block = ret[0];
+            assert.equal(block.face, false);
+            assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2 <red>2nd RED-START</red></red>']);
+            assert.deepEqual(block.messageList[1].line, ['<red>Test message 3 END</red>']);
+          });
           it('3 line', () => {
             const text = `Test message <red>RED-START
             Test message 2
