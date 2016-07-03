@@ -1,6 +1,7 @@
 import Message from './message';
 import MessageBlock from './message-block';
 import Config from './config';
+import TbSerializer from './tb-serializer';
 
 // 単独タグ正規表現
 const noEndTagRegExp = /<([a-z]+) \/>/g;
@@ -15,6 +16,8 @@ export default class ScenarioParser {
     faces.forEach((face) => {
       this.config.loadPersonYaml(face);
     });
+    this.serializer = new TbSerializer(this.config);
+    this.parsedMessages = false;
   }
   parse(input) {
     // trimと配列化
@@ -61,7 +64,16 @@ export default class ScenarioParser {
       result.push(block);
     }
 
+    this.parsedMessages = result;
+
     return result;
+  }
+
+  serialize() {
+    if (!this.parsedMessages) {
+      return '';
+    }
+    this.serializer.serialize(this.parsedMessages);
   }
 
   _tagFormat(textList) {

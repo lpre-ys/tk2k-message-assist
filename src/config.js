@@ -28,6 +28,10 @@ export default class Config {
     return this._config.color;
   }
 
+  getColorNumber(name) {
+    return this._config.color[name] ? this._config.color[name] : false;
+  }
+
   getFace(faceKey) {
     if (!this.hasFace) {
       return false;

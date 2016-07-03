@@ -1,6 +1,6 @@
 export default class MessageBlock {
   constructor(face) {
-    this.face = face;
+    this.face = face || false;
     this.messageList = [];
   }
   addMessage(message) {
