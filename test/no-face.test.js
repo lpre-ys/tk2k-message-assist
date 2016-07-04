@@ -95,6 +95,15 @@ describe('ScenarioParser', () => {
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message<wait></wait>wait message']);
           });
+          it('wait', () => {
+            const text = `Test message<q_wait />q_wait message`;
+
+            const ret = parser.parse(text);
+
+            const block = ret[0];
+            assert.equal(block.face, false);
+            assert.deepEqual(block.messageList[0].line, ['Test message<q_wait></q_wait>q_wait message']);
+          });
         });
         describe('color tag', () => {
           it('1 line', () => {

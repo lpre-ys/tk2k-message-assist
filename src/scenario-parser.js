@@ -4,7 +4,7 @@ import Config from './config';
 import TbSerializer from './tb-serializer';
 
 // 単独タグ正規表現
-const noEndTagRegExp = /<([a-z]+) \/>/g;
+const noEndTagRegExp = /<([a-z\-\_]+) \/>/g;
 // 顔グラ変更命令正規表現
 const faceCommandRegExp = /^\[([^\]]+)]$/;
 
