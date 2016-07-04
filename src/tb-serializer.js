@@ -31,16 +31,16 @@ export default class TbSerializer {
 
   _toTbScript(text) {
     // タグとメッセージに分解
-    let parts = text.split(/(<\/?[a-z\-\_]+>)/);
+    let parts = text.split(/(\\?<\/?[a-z\-\_]+>)/);
     if (parts.length == 1) {
       // 変換無し
-      return text;
+      return this._removeEscapeChar(text);
     }
     // タグの変換
     let prevColor = 0;
     let colorStack = [];
     parts = parts.map((part) => {
-      if (/^<[a-z\-\_]+>/.test(part)) {
+      if (/^<[a-z\-\_]+>$/.test(part)) {
         // 開始タグ
         const tagName = part.substr(1, part.length - 2);
         const colorNumber = this.config.getColorNumber(tagName);
@@ -52,7 +52,7 @@ export default class TbSerializer {
         }
         // 制御タグ
         return `${this._getCChar(tagName)}`;
-      } else if (/^<\/[a-z\-\_]+>/.test(part)) {
+      } else if (/^<\/[a-z\-\_]+>$/.test(part)) {
         // 閉じタグ
         const tagName = part.substr(2, part.length - 3);
         if (!this.config.getColorNumber(tagName) === false) {
@@ -67,7 +67,8 @@ export default class TbSerializer {
           return '';
         }
       }
-      return part;
+      // タグ以外のテキストの場合、エスケープ文字を消す
+      return this._removeEscapeChar(part);
     });
     return parts.join('');
   }
@@ -77,6 +78,10 @@ export default class TbSerializer {
       throw new Error(`対応していないタグです。: ${name}`);
     }
     return cChar[name];
+  }
+
+  _removeEscapeChar(text) {
+    return text.replace(/([^\\]?)\\/, '$1').replace('\\', '\\\\');
   }
 }
 

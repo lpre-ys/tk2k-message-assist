@@ -73,7 +73,7 @@ export default class ScenarioParser {
     if (!this.parsedMessages) {
       return '';
     }
-    this.serializer.serialize(this.parsedMessages);
+    return this.serializer.serialize(this.parsedMessages);
   }
 
   _tagFormat(textList) {
@@ -81,9 +81,14 @@ export default class ScenarioParser {
     const input = this.continueTag + textList.join("\n").replace(noEndTagRegExp, "<$1></$1>");
     // 継続タグのチェック
     const stack = [];
-    const tags = input.match(/<\/?[a-z]+>/g);
+    const tags = input.match(/.?<\/?[a-z\_\-]+>/g);
     if (tags) {
       tags.forEach((tag) => {
+        if (tag.startsWith('\\')) {
+          // エスケープ文字付きの場合対応しない
+          return;
+        }
+        tag = tag.replace(/.?(<\/?[a-z\_\-]+>)/, '$1');
         if (tag.startsWith('</')) {
           // 閉じタグ
           const lastTag = stack.pop(tag);
