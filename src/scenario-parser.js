@@ -26,7 +26,7 @@ export default class ScenarioParser {
     });
 
     // 継続タグの初期化
-    this.continuetag = '';
+    this.continueTag = '';
 
     // limit別に分ける
     const result = [];
