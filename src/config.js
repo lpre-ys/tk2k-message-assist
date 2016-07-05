@@ -61,9 +61,8 @@ export default class Config {
         const person = yamlObj.person[name];
         Object.keys(person.faces).forEach((faceName) => {
           const face = person.faces[faceName];
-          const templateConfig = this._config.style.template.face;
           const nameConfig = this._config.style.display.name;
-          const faceKey = `${name}${templateConfig.prefix}${faceName}${templateConfig.suffix}`;
+          const faceKey = `${name}_${faceName}`;
           const color = face.color || person.color || false;
           let displayName = face.name || person.name;
           if (color && nameConfig.colorScope == 'inner') {

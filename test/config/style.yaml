@@ -5,10 +5,6 @@ style:
       suffix: '】'
       colorScope: 'outer'
     lineLimit: 2
-  template:
-    face:
-      prefix: '_'
-      suffix: ''
 color:
   yellow: 3
   red: 4
