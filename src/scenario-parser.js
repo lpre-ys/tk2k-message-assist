@@ -37,9 +37,6 @@ export default class ScenarioParser {
         // 顔グラ変更
         const faceCommand = text.substr(1, text.length -2);
         const faceConfig = this.config.getFace(faceCommand);
-        if (!faceConfig) {
-          throw new Error(`未知の顔グラフィックです。：${faceCommand}`);
-        }
         // メッセージブロックの作り直し
         if (tmp.length > 0) {
           block.addMessage(this._tagFormat(tmp));
@@ -52,7 +49,7 @@ export default class ScenarioParser {
         return; //continue
       }
       tmp.push(text);
-      if (tmp.length == this.config.lineLimit) {
+      if (tmp.length == this.config.lineLimit + (block.face ? -1 : 0)) {
         block.addMessage(this._tagFormat(tmp));
         tmp = [];
       }

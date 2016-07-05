@@ -88,12 +88,16 @@ describe('ScenarioParser', () => {
       });
       it('message', () => {
         const block1 = ret[0];
-        assert.deepEqual(block1.messageList[0].line, ['テストメッセージです。', 'テストメッセージ2']);
-        assert.deepEqual(block1.messageList[1].line, ['テストメッセージ3']);
+        assert.deepEqual(block1.messageList[0].line, ['テストメッセージです。']);
+        assert.deepEqual(block1.messageList[1].line, ['テストメッセージ2']);
+        assert.deepEqual(block1.messageList[2].line, ['テストメッセージ3']);
         const block2 = ret[1];
-        assert.deepEqual(block2.messageList[0].line, ['スマイルメッセージ1', 'スマイルメッセージ2']);
-        assert.deepEqual(block2.messageList[1].line, ['スマイルメッセージ3', 'スマイルメッセージ4']);
-        assert.deepEqual(block2.messageList[2].line, ['スマイルメッセージ5', 'スマイルメッセージ6']);
+        assert.deepEqual(block2.messageList[0].line, ['スマイルメッセージ1']);
+        assert.deepEqual(block2.messageList[1].line, ['スマイルメッセージ2']);
+        assert.deepEqual(block2.messageList[2].line, ['スマイルメッセージ3']);
+        assert.deepEqual(block2.messageList[3].line, ['スマイルメッセージ4']);
+        assert.deepEqual(block2.messageList[4].line, ['スマイルメッセージ5']);
+        assert.deepEqual(block2.messageList[5].line, ['スマイルメッセージ6']);
       });
     });
   });
