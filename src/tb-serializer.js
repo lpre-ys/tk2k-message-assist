@@ -5,15 +5,26 @@ export default class TbSerializer {
 
   serialize(messageBlockList) {
     const result = [];
+    let showFace = false;
     messageBlockList.forEach((messageBlock) => {
       // 顔グラ関連
       let faceMessage = false;
       if (messageBlock.face) {
+        showFace = true;
         // TODO pos, mirror
         result.push(`Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, 0, 0)`);
         faceMessage = this._toTbScript(messageBlock.face.name);
+      } else if (showFace) {
+        showFace = false;
+        // 顔グラを非表示に
+        result.push('Faice(0, 0, 0)');
       }
       messageBlock.messageList.forEach((message) => {
+        // コメント行の出力
+        console.log(message);
+        message.comments.forEach((comment) => {
+          result.push(`Note("${comment}")`);
+        });
         // タグ置換
         let line = message.line.map((text)=> {
           return this._toTbScript(text);

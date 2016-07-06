@@ -1,5 +1,6 @@
 export default class Message {
-  constructor(textList) {
+  constructor(textList, comments = []) {
     this.line = textList;
+    this.comments = comments;
   }
 }

@@ -21,6 +21,7 @@ describe('ScenarioParser', () => {
           const block = ret[0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
+          assert(block.messageList[0].comments[0], 'comment');
         });
       });
       describe('1 line text', () => {

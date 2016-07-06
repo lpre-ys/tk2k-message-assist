@@ -31,10 +31,12 @@ export default class ScenarioParser {
     // limit別に分ける
     const result = [];
     let tmp = [];
+    let comments = [];
     let block = new MessageBlock(false);
     textList.forEach((text) => {
-      // コメント行は読み飛ばす
+      // コメント行
       if (text.startsWith('//')) {
+        comments.push(text.substr(2).trim());
         return; //continue
       }
       if (this.config.hasFace && faceCommandRegExp.test(text)) {
@@ -43,8 +45,9 @@ export default class ScenarioParser {
         const faceConfig = this.config.getFace(faceCommand);
         // メッセージブロックの作り直し
         if (tmp.length > 0) {
-          block.addMessage(this._tagFormat(tmp));
+          block.addMessage(this._tagFormat(tmp, comments));
           tmp = [];
+          comments = [];
         }
         if (block.hasMessage()) {
           result.push(block);
@@ -68,12 +71,13 @@ export default class ScenarioParser {
         isPageBreak = true;
       }
       if (isPageBreak) {
-        block.addMessage(this._tagFormat(tmp));
+        block.addMessage(this._tagFormat(tmp, comments));
         tmp = [];
+        comments = [];
       }
     });
     if (tmp.length > 0) {
-      block.addMessage(this._tagFormat(tmp));
+      block.addMessage(this._tagFormat(tmp, comments));
     }
     if (block.hasMessage()) {
       result.push(block);
@@ -91,7 +95,7 @@ export default class ScenarioParser {
     return this.serializer.serialize(this.parsedMessages);
   }
 
-  _tagFormat(textList) {
+  _tagFormat(textList, comments) {
     // 前回からの継続タグを追加
     const input = this.continueTag + textList.join("\n").replace(noEndTagRegExp, "<$1></$1>");
     // 継続タグのチェック
@@ -131,6 +135,6 @@ export default class ScenarioParser {
     // 最終出力
     const output = input + stack.reverse().map((v) => { return `</${v}>`; }).join('');
 
-    return new Message(output.trim().split("\n"));
+    return new Message(output.trim().split("\n"), comments);
   }
 }
