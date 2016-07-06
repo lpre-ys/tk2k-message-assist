@@ -48,6 +48,62 @@ describe('ScenarioParser', () => {
       const tbscript = parser.serialize();
       assert(tbscript == 'Text("Test Message <yellow>yellow")');
     });
+    describe('before pb tag', () => {
+      it('top', () => {
+        const script = `\\<pb>Test Message PageBreak`;
+        const ret = parser.parse(script);
+
+        assert.equal(ret.length, 1);
+        const block = ret[0];
+        assert.equal(block.face, false);
+        assert.deepEqual(block.messageList[0].line, ['\\<pb>Test Message PageBreak']);
+
+        // serialize
+        const tbscript = parser.serialize();
+        assert(tbscript == 'Text("<pb>Test Message PageBreak")');
+      });
+      it('inner', () => {
+        const script = `Test Message \\<pb>PageBreak`;
+        const ret = parser.parse(script);
+
+        assert.equal(ret.length, 1);
+        const block = ret[0];
+        assert.equal(block.face, false);
+        assert.deepEqual(block.messageList[0].line, ['Test Message \\<pb>PageBreak']);
+
+        // serialize
+        const tbscript = parser.serialize();
+        assert(tbscript == 'Text("Test Message <pb>PageBreak")');
+      });
+      it('last', () => {
+        const script = `Test Message PageBreak\\<pb>`;
+        const ret = parser.parse(script);
+
+        assert.equal(ret.length, 1);
+        const block = ret[0];
+        assert.equal(block.face, false);
+        assert.deepEqual(block.messageList[0].line, ['Test Message PageBreak\\<pb>']);
+
+        // serialize
+        const tbscript = parser.serialize();
+        assert(tbscript == 'Text("Test Message PageBreak<pb>")');
+      });
+      it('mix', () => {
+        const script = `PageBreak tag: \\<pb> TestMessage<pb>Hidden
+        next line`;
+        const ret = parser.parse(script);
+
+        assert.equal(ret.length, 1);
+        const block = ret[0];
+        assert.equal(block.face, false);
+        assert.deepEqual(block.messageList[0].line, ['PageBreak tag: \\<pb> TestMessage']);
+        assert.deepEqual(block.messageList[1].line, ['next line']);
+
+        // serialize
+        const tbscript = parser.serialize();
+        assert(tbscript == "Text(\"PageBreak tag: <pb> TestMessage\")\nText(\"next line\")");
+      });
+    });
     it('2 escape mark to no change', () => {
       const script = `Escape mark is \\\\`;
       const ret = parser.parse(script);

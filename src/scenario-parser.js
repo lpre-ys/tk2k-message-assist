@@ -50,10 +50,14 @@ export default class ScenarioParser {
       }
       // 改ページ判定
       let isPageBreak = false;
-      if (text.includes('<pb>')) {
+      if (/^<pb>/.test(text)) {
+        isPageBreak = true;
+        text = '';  // 文字表示無し
+      } else if (/[^\\]<pb>/.test(text)) {
         isPageBreak = true;
         // pbタグ以降の文字列を削除
-        text = text.substr(0, text.indexOf('<pb>'));
+        const pbIndex = text.search(/[^\\]<pb>/) + 1;
+        text = text.substr(0, pbIndex);
       }
       tmp.push(text);
       if (tmp.length == this.config.lineLimit + (block.face ? -1 : 0)) {
