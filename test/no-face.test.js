@@ -10,6 +10,19 @@ describe('ScenarioParser', () => {
         const style = fs.readFileSync('./test/config/style.yaml');
         parser = new ScenarioParser(style);
       });
+      describe('comment', () => {
+        it('', () => {
+          const text = `Test message
+          // comment
+          Test message 2`;
+          const ret = parser.parse(text);
+
+          assert.equal(ret.length, 1);
+          const block = ret[0];
+          assert.equal(block.face, false);
+          assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
+        });
+      });
       describe('1 line text', () => {
         it('normal', () => {
           const text = `Test message`;

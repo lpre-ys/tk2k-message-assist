@@ -33,6 +33,10 @@ export default class ScenarioParser {
     let tmp = [];
     let block = new MessageBlock(false);
     textList.forEach((text) => {
+      // コメント行は読み飛ばす
+      if (text.startsWith('//')) {
+        return; //continue
+      }
       if (this.config.hasFace && faceCommandRegExp.test(text)) {
         // 顔グラ変更
         const faceCommand = text.substr(1, text.length -2);
