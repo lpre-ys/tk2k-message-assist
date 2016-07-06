@@ -48,8 +48,18 @@ export default class ScenarioParser {
         block = new MessageBlock(faceConfig);
         return; //continue
       }
+      // 改ページ判定
+      let isPageBreak = false;
+      if (text.includes('<pb>')) {
+        isPageBreak = true;
+        // pbタグ以降の文字列を削除
+        text = text.substr(0, text.indexOf('<pb>'));
+      }
       tmp.push(text);
       if (tmp.length == this.config.lineLimit + (block.face ? -1 : 0)) {
+        isPageBreak = true;
+      }
+      if (isPageBreak) {
         block.addMessage(this._tagFormat(tmp));
         tmp = [];
       }

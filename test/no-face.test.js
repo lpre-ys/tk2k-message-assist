@@ -86,6 +86,16 @@ describe('ScenarioParser', () => {
       });
       describe('decoration', () => {
         describe('control character tag', () => {
+          it('page break', () => {
+            const text = `Test message<pb>after
+                          Test message 2
+                          Test message 3`;
+            const ret = parser.parse(text);
+            const block = ret[0];
+            assert.equal(block.face, false);
+            assert.deepEqual(block.messageList[0].line, ['Test message']);
+            assert.deepEqual(block.messageList[1].line, ['Test message 2', 'Test message 3']);
+          });
           it('wait', () => {
             const text = `Test message<wait />wait message`;
 
@@ -95,7 +105,7 @@ describe('ScenarioParser', () => {
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message<wait></wait>wait message']);
           });
-          it('wait', () => {
+          it('q_wait', () => {
             const text = `Test message<q_wait />q_wait message`;
 
             const ret = parser.parse(text);
