@@ -21,7 +21,6 @@ export default class TbSerializer {
       }
       messageBlock.messageList.forEach((message) => {
         // コメント行の出力
-        console.log(message);
         message.comments.forEach((comment) => {
           result.push(`Note("${comment}")`);
         });
