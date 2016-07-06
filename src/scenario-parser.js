@@ -124,6 +124,8 @@ export default class ScenarioParser {
           return true;
         }
       }).map((v) => { return `<${v}>`; }).join('');
+    } else {
+      this.continueTag = '';
     }
 
     // 最終出力

@@ -179,6 +179,20 @@ describe('ScenarioParser', () => {
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2<yellow>YELLOW-START<green>GREEN</green></yellow></red>']);
             assert.deepEqual(block.messageList[1].line, ['<red><yellow>YELLOW-END</yellow>Test message 3 RED-END</red> normal message']);
           });
+          it('multi color line, after normal color', () => {
+            const text = `Test message <red>RED-START
+            Test message 2
+            Test message 3 RED-END</red> normal message
+            Normal message 2
+            Normal message 3`;
+            const ret = parser.parse(text);
+
+            const block = ret[0];
+            assert.equal(block.face, false);
+            assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2</red>']);
+            assert.deepEqual(block.messageList[1].line, ['<red>Test message 3 RED-END</red> normal message', 'Normal message 2']);
+            assert.deepEqual(block.messageList[2].line, ['Normal message 3']);
+          });
         });
       });
     });
