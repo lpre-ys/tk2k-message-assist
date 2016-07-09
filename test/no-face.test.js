@@ -11,7 +11,7 @@ describe('ScenarioParser', () => {
         parser = new ScenarioParser(style);
       });
       describe('comment', () => {
-        it('', () => {
+        it('normal', () => {
           const text = `Test message
           // comment
           Test message 2`;
@@ -22,6 +22,64 @@ describe('ScenarioParser', () => {
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
           assert(block.messageList[0].comments[0], 'comment');
+        });
+        it('multi window, inner line', () => {
+          const text = `Test message
+          Test message 2
+          Test message 3
+          // comment
+          Test message 4`;
+          const ret = parser.parse(text);
+
+          assert.equal(ret.length, 1);
+          const block = ret[0];
+          assert.equal(block.face, false);
+          assert(block.messageList[0].line[0] == 'Test message');
+          assert(block.messageList[0].line[1] == 'Test message 2');
+          assert(block.messageList[1].line[0] == 'Test message 3');
+          assert(block.messageList[1].line[1] == 'Test message 4');
+          assert(block.messageList[0].comments.length == 0);
+          assert(block.messageList[1].comments.length == 1);
+          assert(block.messageList[1].comments[0] == 'comment');
+        });
+        it('multi window, outer line', () => {
+          const text = `Test message
+          Test message 2
+          // comment
+          Test message 3
+          Test message 4`;
+          const ret = parser.parse(text);
+
+          assert.equal(ret.length, 1);
+          const block = ret[0];
+          assert.equal(block.face, false);
+          assert(block.messageList[0].line[0] == 'Test message');
+          assert(block.messageList[0].line[1] == 'Test message 2');
+          assert(block.messageList[1].line[0] == 'Test message 3');
+          assert(block.messageList[1].line[1] == 'Test message 4');
+          assert(block.messageList[0].comments.length == 0);
+          assert(block.messageList[1].comments.length == 1);
+          assert(block.messageList[1].comments[0] == 'comment');
+        });
+        it('first line', () => {
+          const text = `// comment
+          Test message
+          Test message 2
+          Test message 3
+          Test message 4`;
+          const ret = parser.parse(text);
+
+          assert.equal(ret.length, 1);
+          const block = ret[0];
+          assert.equal(block.face, false);
+          assert(block.messageList[0].line[0] == 'Test message');
+          assert(block.messageList[0].line[1] == 'Test message 2');
+          assert(block.messageList[1].line[0] == 'Test message 3');
+          assert(block.messageList[1].line[1] == 'Test message 4');
+          assert(block.messageList[0].comments.length == 1);
+          assert(block.messageList[1].comments.length == 0);
+          assert(block.messageList[0].comments[0] == 'comment');
+
         });
       });
       describe('1 line text', () => {

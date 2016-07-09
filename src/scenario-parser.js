@@ -32,11 +32,13 @@ export default class ScenarioParser {
     const result = [];
     let tmp = [];
     let comments = [];
+    let isBeforeComment = false;
     let block = new MessageBlock(false);
     textList.forEach((text) => {
       // コメント行
       if (text.startsWith('//')) {
         comments.push(text.substr(2).trim());
+        isBeforeComment = true;
         return; //continue
       }
       if (this.config.hasFace && faceCommandRegExp.test(text)) {
@@ -45,9 +47,14 @@ export default class ScenarioParser {
         const faceConfig = this.config.getFace(faceCommand);
         // メッセージブロックの作り直し
         if (tmp.length > 0) {
-          block.addMessage(this._tagFormat(tmp, comments));
+          if (isBeforeComment) {
+            // 次のブロックにコメントを持ち越す
+            block.addMessage(this._tagFormat(tmp, []));
+          } else {
+            block.addMessage(this._tagFormat(tmp, comments));
+            comments = [];
+          }
           tmp = [];
-          comments = [];
         }
         if (block.hasMessage()) {
           result.push(block);
@@ -55,6 +62,7 @@ export default class ScenarioParser {
         block = new MessageBlock(faceConfig);
         return; //continue
       }
+      isBeforeComment = false;
       // 改ページ判定
       let isPageBreak = false;
       if (/^<pb>/.test(text)) {
