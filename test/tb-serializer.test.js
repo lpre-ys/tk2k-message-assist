@@ -108,6 +108,13 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
 
         assert.equal(ret, `Text("quarter wait before\\.after")`);
       });
+      it('close', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['close before<close></close>after']));
+        const ret = serializer.serialize([messageBlock]);
+
+        assert.equal(ret, `Text("close before\\^after")`);
+      });
       it('flash', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['normal<flash>flash</flash>normal']));

@@ -101,9 +101,10 @@ const cChar = {
   stop: '\\!',
   wait: '\\|',
   q_wait: '\\.',
+  close: '\\^',
   flash: '\\>',
   flash_end: '\\<'
 };
 
-const cNoEndTags = ['stop', 'wait', 'q_wait'];
+const cNoEndTags = ['br', 'stop', 'wait', 'q_wait', 'close'];
 const cNormalTags = ['flash'];
