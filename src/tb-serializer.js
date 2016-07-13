@@ -33,6 +33,10 @@ export default class TbSerializer {
         if (faceMessage) {
           line.unshift(faceMessage);
         }
+        // 常時瞬間表示の場合、制御文字を追加
+        if (this.config.isFlash) {
+          line = line.map((v) => {return `\\>${v}`;});
+        }
         result.push(`Text("${line.join(cChar.br)}")`);
       });
     });

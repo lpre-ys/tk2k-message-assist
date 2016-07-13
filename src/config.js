@@ -24,6 +24,13 @@ export default class Config {
     return this._config.style.display.lineLimit;
   }
 
+  get isFlash() {
+    if (this._config.style.display && this._config.style.display.isFlash) {
+          return true;
+    }
+    return false;
+  }
+
   get colors() {
     return this._config.color;
   }
