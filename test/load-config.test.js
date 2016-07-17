@@ -32,25 +32,63 @@ describe('Config', () => {
         assert(config.hasFace === false);
       });
     });
-    it('faceKeyList', () => {
-      config.loadPersonYaml(personYaml1);
-      config.loadPersonYaml(personYaml2);
-
-      assert.equal(config.faceKeyList.length, 4);
-      assert(config.faceKeyList.includes('テスト君_普通'));
-      assert(config.faceKeyList.includes('テスト君_笑'));
-      assert(config.faceKeyList.includes('テスト2君_普通'));
-      assert(config.faceKeyList.includes('テスト2君_笑'));
+    describe('faceKeyList', () => {
+      beforeEach(() => {
+        config.loadPersonYaml(personYaml1);
+        config.loadPersonYaml(personYaml2);
+      });
+      it('顔設定が4つ全て読み込まれている事', () => {
+        assert.equal(config.faceKeyList.length, 4);
+      });
+      it('顔設定のキーが全て正しい事', () => {
+        assert(config.faceKeyList.includes('テスト君_普通'));
+        assert(config.faceKeyList.includes('テスト君_笑'));
+        assert(config.faceKeyList.includes('テスト2君_普通'));
+        assert(config.faceKeyList.includes('テスト2君_笑'));
+      });
     });
-    it('getFace', () => {
-      config.loadPersonYaml(personYaml1);
-      config.loadPersonYaml(personYaml2);
+    describe('getFace', () => {
+      beforeEach(() => {
+        config.loadPersonYaml(personYaml1);
+        config.loadPersonYaml(personYaml2);
+      });
+      it('方向・位置指定無しの場合、正常に設定が取れる事', () => {
+        const face = config.getFace('テスト君_普通');
 
-      const face = config.getFace('テスト君_普通');
+        assert(face.filename == 'test1.png');
+        assert(face.number == '1');
+        assert(face.name == '<yellow>【テスト１】</yellow>');
+      });
+      describe('位置指定有りの場合、位置設定が有ること', () => {
+        it('右の場合true', () => {
+          const face = config.getFace('テスト君_普通(右)');
 
-      assert(face.filename == 'test1.png');
-      assert(face.number == '1');
-      assert(face.name == '<yellow>【テスト１】</yellow>');
+          assert(face.name == '<yellow>【テスト１】</yellow>');
+          assert(face.pos);
+        });
+        it('左の場合false', () => {
+          const face = config.getFace('テスト君_普通(左)');
+
+          assert(face.name == '<yellow>【テスト１】</yellow>');
+          assert(!face.pos);
+        });
+      });
+      it('反転指定有りの場合、face.mirrorがTRUEであること', () => {
+        const face = config.getFace('テスト君_普通(反転)');
+
+        assert(face.name == '<yellow>【テスト１】</yellow>');
+        assert(face.mirror);
+      });
+      describe('位置・反転の両方の指定が有る場合', () => {
+        it('位置指定が取れる事', () => {
+          const face = config.getFace('テスト君_普通(右,反転)');
+          assert(face.pos);
+        });
+        it('反転指定が取れる事', () => {
+          const face = config.getFace('テスト君_普通(右,反転)');
+          assert(face.mirror);
+        });
+      });
     });
     it('multi face in one img', () => {
       config.loadPersonYaml(personMultiFace);

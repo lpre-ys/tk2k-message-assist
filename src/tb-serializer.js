@@ -11,8 +11,9 @@ export default class TbSerializer {
       let faceMessage = false;
       if (messageBlock.face) {
         showFace = true;
-        // TODO pos, mirror
-        result.push(`Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, 0, 0)`);
+        const posCode = messageBlock.face.pos ? 1 : 0;
+        const mirrorCode = messageBlock.face.mirror ? 1 : 0;
+        result.push(`Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})`);
         faceMessage = this._toTbScript(messageBlock.face.name);
       } else if (showFace) {
         showFace = false;

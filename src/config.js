@@ -1,4 +1,5 @@
 import jsyaml from 'js-yaml';
+import Const from './const';
 
 export default class Config {
   constructor() {
@@ -44,7 +45,28 @@ export default class Config {
       return false;
     }
 
-    return this._config.face[faceKey] ? this._config.face[faceKey] : false;
+    const re = new RegExp(`^(.*)\\${Const.face_place.prefix}(.*)\\${Const.face_place.suffix}$`);
+    const found = faceKey.match(re);
+    if (found !== null) {
+      faceKey = found[1];
+    }
+    const ret = this._config.face[faceKey] ? this._config.face[faceKey] : false;
+
+    if (found !== null) {
+      const placeSettings = found[2].split(',');
+      // 反転
+      if (placeSettings.includes(Const.face_place.mirror)) {
+        ret.mirror = true;
+      }
+      // 表示位置
+      if (placeSettings.includes(Const.face_place.pos.left)) {
+        ret.pos = false;
+      } else if (placeSettings.includes(Const.face_place.pos.right)) {
+        ret.pos = true;
+      }
+    }
+
+    return ret;
   }
 
   loadStyleYaml(yaml) {

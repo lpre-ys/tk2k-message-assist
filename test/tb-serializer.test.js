@@ -46,6 +46,37 @@ Text("TestMessage3")`);
       });
     });
     describe('face', () => {
+      describe('位置指定', () => {
+        it('右のとき1', () => {
+          const faceConfig = config.getFace('テスト君_普通(右)');
+          const messageBlock = new MessageBlock(faceConfig);
+          messageBlock.addMessage(new Message(['TestMessage']));
+          const ret = serializer.serialize([messageBlock]);
+
+          assert.equal(ret, `Faice("test1.png", 1, 1, 0)
+Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+        });
+        it('左のとき0', () => {
+          const faceConfig = config.getFace('テスト君_普通(左)');
+          const messageBlock = new MessageBlock(faceConfig);
+          messageBlock.addMessage(new Message(['TestMessage']));
+          const ret = serializer.serialize([messageBlock]);
+
+          assert.equal(ret, `Faice("test1.png", 1, 0, 0)
+Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+        });
+      });
+      describe('反転指定', () => {
+        it('反転のとき1', () => {
+          const faceConfig = config.getFace('テスト君_普通(反転)');
+          const messageBlock = new MessageBlock(faceConfig);
+          messageBlock.addMessage(new Message(['TestMessage']));
+          const ret = serializer.serialize([messageBlock]);
+
+          assert.equal(ret, `Faice("test1.png", 1, 0, 1)
+Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+        });
+      });
       it('1 face', () => {
         const faceConfig = config.getFace('テスト君_普通');
         const messageBlock = new MessageBlock(faceConfig);
