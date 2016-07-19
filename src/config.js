@@ -50,7 +50,7 @@ export default class Config {
     if (found !== null) {
       faceKey = found[1];
     }
-    const ret = this._config.face[faceKey] ? this._config.face[faceKey] : false;
+    const ret = this._config.face[faceKey] ? Object.assign({}, this._config.face[faceKey]) : false;
 
     if (found !== null) {
       const placeSettings = found[2].split(',');

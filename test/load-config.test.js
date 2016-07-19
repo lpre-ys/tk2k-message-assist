@@ -89,6 +89,12 @@ describe('Config', () => {
           assert(face.mirror);
         });
       });
+      it('位置・反転指定の後、指定無しで取得した場合、デフォルト設定が取れる事', () => {
+        config.getFace('テスト君_普通(右,反転)');
+        const face = config.getFace('テスト君_普通');
+        assert(!face.pos);
+        assert(!face.mirror);
+      });
     });
     it('multi face in one img', () => {
       config.loadPersonYaml(personMultiFace);
