@@ -116,6 +116,13 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
 
         assert.equal(ret, `Text("normal\\C[3]yellow\\C[4]red\\C[3]\\C[0]normal")`);
       });
+      it('複数行にまたがるタグ', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['Test message <red>RED-START', 'Test message 2 RED-END</red> normal message']));
+        const ret = serializer.serialize([messageBlock]);
+        console.log(ret);
+        assert(ret == `Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message")`);
+      });
     });
     describe('control tag', () => {
       it('stop', () => {

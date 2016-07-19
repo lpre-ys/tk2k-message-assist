@@ -1,6 +1,7 @@
 export default class TbSerializer {
   constructor(config) {
     this.config = config;
+    this.colorStack = [];
   }
 
   serialize(messageBlockList) {
@@ -26,6 +27,7 @@ export default class TbSerializer {
           result.push(`Note("${comment}")`);
         });
         // タグ置換
+        this.colorStack = []; // 色タグのスタックリセット
         let line = message.line.map((text)=> {
           return this._toTbScript(text);
         });
@@ -53,7 +55,6 @@ export default class TbSerializer {
     }
     // タグの変換
     let prevColor = 0;
-    let colorStack = [];
     parts = parts.map((part) => {
       if (/^<[a-z\-\_]+>$/.test(part)) {
         // 開始タグ
@@ -61,7 +62,7 @@ export default class TbSerializer {
         const colorNumber = this.config.getColorNumber(tagName);
         if (colorNumber) {
           // 色タグ
-          colorStack.push(prevColor);
+          this.colorStack.push(prevColor);
           prevColor = colorNumber;
           return `${cChar.color}[${colorNumber}]`;
         }
@@ -72,7 +73,7 @@ export default class TbSerializer {
         const tagName = part.substr(2, part.length - 3);
         if (!this.config.getColorNumber(tagName) === false) {
           // 色タグ
-          prevColor = colorStack.pop();
+          prevColor = this.colorStack.pop();
           return `${cChar.color}[${prevColor}]`;
         } else if (cNormalTags.includes(tagName)) {
           // 閉じタグ有りの制御タグ
