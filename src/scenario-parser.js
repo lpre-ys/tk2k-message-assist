@@ -3,6 +3,8 @@ import MessageBlock from './message-block';
 import Config from './config';
 import TbSerializer from './tb-serializer';
 
+// ブロック構文チェック用正規表現
+const blockRegExpStr = '(^\{|^.*[^\\\\]\\{)';
 // 単独タグ正規表現
 const noEndTagRegExp = /<([a-z\-\_]+) \/>/g;
 // 顔グラ変更命令正規表現
@@ -25,6 +27,12 @@ export default class ScenarioParser {
       return value.trim();
     });
 
+    // シナリオブロック変換
+    if (input.match(new RegExp(blockRegExpStr, 'mg'))) {
+      // ブロック変換
+    }
+
+    // TODO 以後を内部メソッドに変更する
     // 継続タグの初期化
     this.continueTag = '';
 
