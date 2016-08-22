@@ -36,6 +36,10 @@ export default class Config {
     return this._config.color;
   }
 
+  get varNo() {
+    return this._config.style.varNo ? this._config.style.varNo : 1;
+  }
+
   getColorNumber(name) {
     return this._config.color[name] ? this._config.color[name] : false;
   }

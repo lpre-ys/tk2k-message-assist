@@ -199,6 +199,19 @@ Text("TestMessage2")
 Exit
 EndIf`);
       });
+      it('varNoの読み取り', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['TestMessage']));
+        const scenarioBlock = new ScenarioBlock(42);
+        scenarioBlock.child.push([messageBlock]);
+
+        const ret = serializer.serialize([scenarioBlock], {varNo: 39});
+
+        assert.equal(ret, `If(01, 39, 0, 42, 0, 0)
+Text("TestMessage")
+Exit
+EndIf`);
+      });
     });
     describe('ネスト有り', () => {
       it('シンプルなパターン', () => {

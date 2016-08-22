@@ -7,13 +7,13 @@ export default class TbSerializer {
     this.colorStack = [];
   }
 
-  serialize(blockList) {
+  serialize(blockList, option = {}) {
     if (blockList.length == 0) {
       return '';
     }
 
     let result = [];
-    const varNo = 1;
+    const varNo = option.varNo ? option.varNo : this.config.varNo;
 
     // TODO 判定の仕方を考える
     if (blockList[0] instanceof ScenarioBlock) {
