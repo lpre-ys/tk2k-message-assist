@@ -1,10 +1,11 @@
+import ScenarioBlock from './scenario-block';
 import Message from './message';
 import MessageBlock from './message-block';
 import Config from './config';
 import TbSerializer from './tb-serializer';
 
 // ブロック構文チェック用正規表現
-const blockRegExpStr = '(^\{|^.*[^\\\\]\\{)';
+const blockRegExpStr = '(?:^\{|^(.*[^\\\\])\\{)';
 // 単独タグ正規表現
 const noEndTagRegExp = /<([a-z\-\_]+) \/>/g;
 // 顔グラ変更命令正規表現
@@ -28,10 +29,50 @@ export default class ScenarioParser {
     });
 
     // シナリオブロック変換
-    if (input.match(new RegExp(blockRegExpStr, 'mg'))) {
+    if ((new RegExp(blockRegExpStr, 'mg')).test(input)) {
       // ブロック変換
-    }
+      const root = new ScenarioBlock(0, false, 'root');
+      const tmp = [];
+      const blockRegExp = new RegExp(blockRegExpStr);
+      let target = root;
+      let block;
+      textList.forEach((text) => {
+        const match = text.match(blockRegExp);
+        if (match) {
+          // ブロック開始
+          tmp.length = 0;
+          const label = match[1] ? match[1].trim() : false;
+          block = new ScenarioBlock(target.child.length + 1, target, label);
+          target.child.push(block);
+          target = block;
+        } else if (text == '}') {
+          // ブロック終了
+          if (tmp.length > 0) {
+            target.child.push(this._textParse(tmp.slice()));
+            tmp.length = 0;
+          }
+          target = target.parentBlock;
+        } else {
+          // その他
+          tmp.push(text);
+        }
+      });
 
+      return root.child;
+    } else {
+      // シナリオブロック無しの場合
+      return this._textParse(textList);
+    }
+  }
+
+  serialize() {
+    if (!this.parsedMessages) {
+      return '';
+    }
+    return this.serializer.serialize(this.parsedMessages);
+  }
+
+  _textParse(textList) {
     // TODO 以後を内部メソッドに変更する
     // 継続タグの初期化
     this.continueTag = '';
@@ -102,13 +143,6 @@ export default class ScenarioParser {
     this.parsedMessages = result;
 
     return result;
-  }
-
-  serialize() {
-    if (!this.parsedMessages) {
-      return '';
-    }
-    return this.serializer.serialize(this.parsedMessages);
   }
 
   _tagFormat(textList, comments) {

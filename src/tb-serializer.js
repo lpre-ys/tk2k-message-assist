@@ -1,10 +1,51 @@
+// import MessageBlock from './message-block';
+import ScenarioBlock from './scenario-block';
+
 export default class TbSerializer {
   constructor(config) {
     this.config = config;
     this.colorStack = [];
   }
 
-  serialize(messageBlockList) {
+  serialize(blockList) {
+    if (blockList.length == 0) {
+      return '';
+    }
+
+    let result = [];
+    const varNo = 1;
+
+    // TODO 判定の仕方を考える
+    if (blockList[0] instanceof ScenarioBlock) {
+      // シナリオブロック有り
+      blockList.forEach((scenarioBlock) => {
+        result = result.concat(this._serializeScenarioBlock(scenarioBlock, varNo));
+      });
+    } else {
+      // シナリオブロック無し
+      result = result.concat(this._serializeMessageBlock(blockList));
+    }
+
+    return result.join("\n");
+  }
+
+  _serializeScenarioBlock(scenarioBlock, varNo) {
+    let result = [];
+    result.push(`If(01, ${varNo}, 0, ${scenarioBlock.no}, 0, 0)`);
+    scenarioBlock.child.forEach((child) => {
+      if(Array.isArray(child)) {
+        result = result.concat(this._serializeMessageBlock(child));
+      } else {
+        result = result.concat(this._serializeScenarioBlock(child, varNo + 1));
+      }
+    });
+    result.push('Exit');
+    result.push('EndIf');
+
+    return result;
+  }
+
+  _serializeMessageBlock(messageBlockList) {
     const result = [];
     let showFace = false;
     messageBlockList.forEach((messageBlock) => {
@@ -43,7 +84,8 @@ export default class TbSerializer {
         result.push(`Text("${line.join(cChar.br)}")`);
       });
     });
-    return result.join("\n");
+
+    return result;
   }
 
   _toTbScript(text) {

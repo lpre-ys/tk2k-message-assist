@@ -4,6 +4,7 @@ import TbSerializer from '../src/tb-serializer';
 import Config from '../src/config';
 import MessageBlock from '../src/message-block';
 import Message from '../src/message';
+import ScenarioBlock from '../src/scenario-block';
 
 describe('TbSerializer', () => {
   let serializer;
@@ -159,6 +160,74 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         const ret = serializer.serialize([messageBlock]);
 
         assert.equal(ret, `Text("normal\\>flash\\<normal")`);
+      });
+    });
+  });
+  describe('シナリオブロック有り', () => {
+    describe('ネスト無し', () => {
+      it('1block', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['TestMessage']));
+        const scenarioBlock = new ScenarioBlock(42);
+        scenarioBlock.child.push([messageBlock]);
+
+        const ret = serializer.serialize([scenarioBlock]);
+
+        assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
+Text("TestMessage")
+Exit
+EndIf`);
+      });
+      it('2block', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['TestMessage']));
+        const messageBlock2 = new MessageBlock();
+        messageBlock2.addMessage(new Message(['TestMessage2']));
+        const scenarioBlock = new ScenarioBlock(42);
+        scenarioBlock.child.push([messageBlock]);
+        const scenarioBlock2 = new ScenarioBlock(39);
+        scenarioBlock2.child.push([messageBlock2]);
+
+        const ret = serializer.serialize([scenarioBlock, scenarioBlock2]);
+
+        assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
+Text("TestMessage")
+Exit
+EndIf
+If(01, 1, 0, 39, 0, 0)
+Text("TestMessage2")
+Exit
+EndIf`);
+      });
+    });
+    describe('ネスト有り', () => {
+      it('シンプルなパターン', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['TestMessage']));
+        const messageBlock2 = new MessageBlock();
+        messageBlock2.addMessage(new Message(['TestMessage2']));
+        const scenarioBlock = new ScenarioBlock(42);
+        const childSBlock1 = new ScenarioBlock(111, scenarioBlock);
+        childSBlock1.child.push([messageBlock]);
+        const childSBlock2 = new ScenarioBlock(222, scenarioBlock);
+        childSBlock2.child.push([messageBlock2]);
+        scenarioBlock.child.push(childSBlock1);
+        scenarioBlock.child.push(childSBlock2);
+        console.log(scenarioBlock.child);
+
+        const ret = serializer.serialize([scenarioBlock]);
+
+        assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
+If(01, 2, 0, 111, 0, 0)
+Text("TestMessage")
+Exit
+EndIf
+If(01, 2, 0, 222, 0, 0)
+Text("TestMessage2")
+Exit
+EndIf
+Exit
+EndIf`);
       });
     });
   });
