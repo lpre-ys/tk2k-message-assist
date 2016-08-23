@@ -134,7 +134,6 @@ describe('ScenarioParser', () => {
                         Test message 2`;
           const ret = parser.parse(text);
           const block = ret[0];
-          console.log(block);
           assert(block.messageList[0].line[0] == 'test->test->test->');
           assert(block.messageList[0].line[1] == 'Test message 2');
         });

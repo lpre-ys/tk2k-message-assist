@@ -121,7 +121,6 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['Test message <red>RED-START', 'Test message 2 RED-END</red> normal message']));
         const ret = serializer.serialize([messageBlock]);
-        console.log(ret);
         assert(ret == `Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message")`);
       });
     });
@@ -243,7 +242,6 @@ EndIf`);
         childSBlock2.child.push([messageBlock2]);
         scenarioBlock.child.push(childSBlock1);
         scenarioBlock.child.push(childSBlock2);
-        console.log(scenarioBlock.child);
 
         const ret = serializer.serialize([scenarioBlock]);
 
