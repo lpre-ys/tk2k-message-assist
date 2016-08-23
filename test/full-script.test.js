@@ -49,10 +49,10 @@ describe('ScenarioParser', () => {
       person.push(fs.readFileSync('./test/config/person2.yaml'));
       parser = new ScenarioParser(style, person);
 
-      const tree = parser.parse(input);
+      parser.parse(input);
 
       // シリアライズ
-      const ret = parser.serializer.serialize(tree);
+      const ret = parser.serialize();
 
       assert(ret == `If(01, 87, 0, 1, 0, 0)
 Text("シナリオブロックのサンプルです。")
