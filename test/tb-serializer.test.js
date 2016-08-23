@@ -199,7 +199,7 @@ Text("TestMessage2")
 Exit
 EndIf`);
       });
-      it('varNoの読み取り', () => {
+      it('varNoの読み取り(オプション)', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['TestMessage']));
         const scenarioBlock = new ScenarioBlock(42);
@@ -211,6 +211,23 @@ EndIf`);
 Text("TestMessage")
 Exit
 EndIf`);
+      });
+      it('varNoの読み取り(yaml)', () => {
+        const style = fs.readFileSync('./test/config/style_varno.yaml');
+        config.loadStyleYaml(style);
+
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['TestMessage']));
+        const scenarioBlock = new ScenarioBlock(42);
+        scenarioBlock.child.push([messageBlock]);
+
+        const ret = serializer.serialize([scenarioBlock]);
+
+        assert.equal(ret, `If(01, 87, 0, 42, 0, 0)
+Text("TestMessage")
+Exit
+EndIf`);
+
       });
     });
     describe('ネスト有り', () => {
