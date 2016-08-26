@@ -25,14 +25,18 @@ describe('TbSerializer', () => {
       it('1 line 1 window', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['TestMessage']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("TestMessage")`);
       });
       it('2 line 1 window', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['TestMessage', 'TestMessage2']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("TestMessage\\kTestMessage2")`);
       });
@@ -40,7 +44,9 @@ describe('TbSerializer', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['TestMessage', 'TestMessage2']));
         messageBlock.addMessage(new Message(['TestMessage3']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("TestMessage\\kTestMessage2")
 Text("TestMessage3")`);
@@ -52,7 +58,9 @@ Text("TestMessage3")`);
           const faceConfig = config.getFace('テスト君_普通(右)');
           const messageBlock = new MessageBlock(faceConfig);
           messageBlock.addMessage(new Message(['TestMessage']));
-          const ret = serializer.serialize([messageBlock]);
+          const root = new ScenarioBlock(0);
+          root.child.push([messageBlock]);
+          const ret = serializer.serialize(root);
 
           assert.equal(ret, `Faice("test1.png", 1, 1, 0)
 Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
@@ -61,7 +69,9 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
           const faceConfig = config.getFace('テスト君_普通(左)');
           const messageBlock = new MessageBlock(faceConfig);
           messageBlock.addMessage(new Message(['TestMessage']));
-          const ret = serializer.serialize([messageBlock]);
+          const root = new ScenarioBlock(0);
+          root.child.push([messageBlock]);
+          const ret = serializer.serialize(root);
 
           assert.equal(ret, `Faice("test1.png", 1, 0, 0)
 Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
@@ -72,7 +82,9 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
           const faceConfig = config.getFace('テスト君_普通(反転)');
           const messageBlock = new MessageBlock(faceConfig);
           messageBlock.addMessage(new Message(['TestMessage']));
-          const ret = serializer.serialize([messageBlock]);
+          const root = new ScenarioBlock(0);
+          root.child.push([messageBlock]);
+          const ret = serializer.serialize(root);
 
           assert.equal(ret, `Faice("test1.png", 1, 0, 1)
 Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
@@ -82,7 +94,9 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
         const faceConfig = config.getFace('テスト君_普通');
         const messageBlock = new MessageBlock(faceConfig);
         messageBlock.addMessage(new Message(['TestMessage']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Faice("test1.png", 1, 0, 0)
 Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
@@ -94,7 +108,9 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
         const faceConfig2 = config.getFace('テスト2君_笑');
         const messageBlock2 = new MessageBlock(faceConfig2);
         messageBlock2.addMessage(new Message(['TestMessage2']));
-        const ret = serializer.serialize([messageBlock1, messageBlock2]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock1, messageBlock2]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Faice("test1.png", 1, 0, 0)
 Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")
@@ -106,21 +122,28 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
       it('1 tag', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['normal<yellow>yellow</yellow>normal']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("normal\\C[3]yellow\\C[0]normal")`);
       });
       it('2 tag', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['normal<yellow>yellow<red>red</red></yellow>normal']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("normal\\C[3]yellow\\C[4]red\\C[3]\\C[0]normal")`);
       });
       it('複数行にまたがるタグ', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['Test message <red>RED-START', 'Test message 2 RED-END</red> normal message']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
+
         assert(ret == `Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message")`);
       });
     });
@@ -128,35 +151,45 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
       it('stop', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['stop before<stop></stop>after']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("stop before\\!after")`);
       });
       it('wait', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['wait before<wait></wait>after']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("wait before\\|after")`);
       });
       it('q_wait', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['quarter wait before<q_wait></q_wait>after']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("quarter wait before\\.after")`);
       });
       it('close', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['close before<close></close>after']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("close before\\^after")`);
       });
       it('flash', () => {
         const messageBlock = new MessageBlock();
         messageBlock.addMessage(new Message(['normal<flash>flash</flash>normal']));
-        const ret = serializer.serialize([messageBlock]);
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
 
         assert.equal(ret, `Text("normal\\>flash\\<normal")`);
       });
@@ -169,8 +202,10 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         messageBlock.addMessage(new Message(['TestMessage']));
         const scenarioBlock = new ScenarioBlock(42);
         scenarioBlock.child.push([messageBlock]);
+        const rootBlock = new ScenarioBlock(0);
+        rootBlock.child.push(scenarioBlock);
 
-        const ret = serializer.serialize([scenarioBlock]);
+        const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
 Text("TestMessage")
@@ -186,8 +221,11 @@ EndIf`);
         scenarioBlock.child.push([messageBlock]);
         const scenarioBlock2 = new ScenarioBlock(39);
         scenarioBlock2.child.push([messageBlock2]);
+        const rootBlock = new ScenarioBlock(0);
+        rootBlock.child.push(scenarioBlock);
+        rootBlock.child.push(scenarioBlock2);
 
-        const ret = serializer.serialize([scenarioBlock, scenarioBlock2]);
+        const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
 Text("TestMessage")
@@ -203,8 +241,10 @@ EndIf`);
         messageBlock.addMessage(new Message(['TestMessage']));
         const scenarioBlock = new ScenarioBlock(42);
         scenarioBlock.child.push([messageBlock]);
+        const rootBlock = new ScenarioBlock(0);
+        rootBlock.child.push(scenarioBlock);
 
-        const ret = serializer.serialize([scenarioBlock], {varNo: 39});
+        const ret = serializer.serialize(rootBlock, {varNo: 39});
 
         assert.equal(ret, `If(01, 39, 0, 42, 0, 0)
 Text("TestMessage")
@@ -219,8 +259,10 @@ EndIf`);
         messageBlock.addMessage(new Message(['TestMessage']));
         const scenarioBlock = new ScenarioBlock(42);
         scenarioBlock.child.push([messageBlock]);
+        const rootBlock = new ScenarioBlock(0);
+        rootBlock.child.push(scenarioBlock);
 
-        const ret = serializer.serialize([scenarioBlock]);
+        const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 87, 0, 42, 0, 0)
 Text("TestMessage")
@@ -242,8 +284,10 @@ EndIf`);
         childSBlock2.child.push([messageBlock2]);
         scenarioBlock.child.push(childSBlock1);
         scenarioBlock.child.push(childSBlock2);
+        const rootBlock = new ScenarioBlock(0);
+        rootBlock.child.push(scenarioBlock);
 
-        const ret = serializer.serialize([scenarioBlock]);
+        const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
 If(01, 2, 0, 111, 0, 0)
