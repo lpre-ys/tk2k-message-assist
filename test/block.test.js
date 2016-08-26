@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import fs from 'fs';
 import ScenarioParser from '../src/scenario-parser';
+import Const from '../src/const';
 
 describe('ScenarioParser', () => {
   let parser;
@@ -12,12 +13,19 @@ describe('ScenarioParser', () => {
     describe('ネスト無し', () => {
       describe('ブロック1個の場合', () => {
         let sBlock;
+        let ret;
         beforeEach(() => {
           const text = `{
             Test message
           }`;
-          const ret = parser.parse(text);
-          sBlock = ret[0];
+          ret = parser.parse(text);
+          sBlock = ret.child[0];
+        });
+        it('rootが単一のシナリオブロックであること', () => {
+          assert(ret.type === Const.block_type.scenario);
+        });
+        it('rootの子がシナリオブロックであること', () => {
+          assert(sBlock.type === Const.block_type.scenario);
         });
         it('シナリオブロックの番号が1であること', () => {
           assert(sBlock.no == 1);
@@ -38,8 +46,8 @@ describe('ScenarioParser', () => {
             Test message2
           }`;
           const ret = parser.parse(text);
-          sBlock1 = ret[0];
-          sBlock2 = ret[1];
+          sBlock1 = ret.child[0];
+          sBlock2 = ret.child[1];
         });
         it('シナリオブロック1の番号が1であること', () => {
           assert(sBlock1.no == 1);
@@ -62,7 +70,7 @@ describe('ScenarioParser', () => {
             Test message
           }`;
           const ret = parser.parse(text);
-          const sBlock = ret[0];
+          const sBlock = ret.child[0];
           assert(sBlock.label == 'ラベルテスト');
         });
         it('ラベルと{の間にスペースがある場合、スペースなしのラベル', () => {
@@ -70,7 +78,7 @@ describe('ScenarioParser', () => {
             Test message
           }`;
           const ret = parser.parse(text);
-          const sBlock = ret[0];
+          const sBlock = ret.child[0];
           assert(sBlock.label == 'ラベルテスト');
         });
         it('ラベル無しの場合、ラベルがfalseであること', () => {
@@ -78,7 +86,7 @@ describe('ScenarioParser', () => {
             Test message
           }`;
           const ret = parser.parse(text);
-          const sBlock = ret[0];
+          const sBlock = ret.child[0];
           assert(sBlock.label == false);
         });
         it('ラベル有り無しが混在していても、正常に設定されていること', () => {
@@ -92,9 +100,9 @@ describe('ScenarioParser', () => {
             Test message
           }`;
           const ret = parser.parse(text);
-          assert(ret[0].label == 'ラベルテスト');
-          assert(ret[1].label == false);
-          assert(ret[2].label == 'ラベル2');
+          assert(ret.child[0].label == 'ラベルテスト');
+          assert(ret.child[1].label == false);
+          assert(ret.child[2].label == 'ラベル2');
         });
       });
     });
@@ -112,28 +120,31 @@ describe('ScenarioParser', () => {
           }`;
           root = parser.parse(text);
         });
-        it('root配列のサイズが1であること', () => {
-          assert(root.length == 1);
+        it('rootがシナリオブロックであること', () => {
+          assert(root.type === Const.block_type.scenario);
+        });
+        it('rootの子のサイズが1であること', () => {
+          assert(root.child.length == 1);
         });
         describe('最初のシナリオブロック', () => {
           it('番号が1であること', () => {
-            assert(root[0].no == 1);
+            assert(root.child[0].no == 1);
           });
           it('ラベルがparentであること', () => {
-            assert(root[0].label == 'parent');
+            assert(root.child[0].label == 'parent');
           });
           it('子要素が配列であること', () => {
-            assert(Array.isArray(root[0].child));
+            assert(Array.isArray(root.child[0].child));
           });
           it('子要素のサイズが2であること', () => {
-            assert(root[0].child.length == 2);
+            assert(root.child[0].child.length == 2);
           });
         });
         describe('ネストされたシナリオブロック', () => {
           describe('1つ目', () => {
             let block;
             beforeEach(() => {
-              block = root[0].child[0];
+              block = root.child[0].child[0];
             });
             it('番号が1であること', () => {
               assert(block.no == 1);
@@ -150,7 +161,7 @@ describe('ScenarioParser', () => {
           describe('2つ目', () => {
             let block;
             beforeEach(() => {
-              block = root[0].child[1];
+              block = root.child[0].child[1];
             });
             it('番号が2であること', () => {
               assert(block.no == 2);

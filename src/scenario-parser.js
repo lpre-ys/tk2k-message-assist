@@ -31,9 +31,9 @@ export default class ScenarioParser {
     });
 
     // シナリオブロック変換
+    const root = new ScenarioBlock(0, false, 'root');
     if ((new RegExp(blockRegExpStr, 'mg')).test(input)) {
-      // ブロック変換
-      const root = new ScenarioBlock(0, false, 'root');
+      // 子ブロック有り
       const tmp = [];
       const blockRegExp = new RegExp(blockRegExpStr);
       let target = root;
@@ -60,15 +60,15 @@ export default class ScenarioParser {
         }
       });
 
-      result = root.child;
+      result = root;
     } else {
       // シナリオブロック無しの場合
-      result = this._textParse(textList);
+      root.child.push(this._textParse(textList));
     }
 
-    this.parsedMessages = result;
+    this.parsedMessages = root;
 
-    return result;
+    return root;
   }
 
   serialize() {

@@ -1,5 +1,4 @@
-// import MessageBlock from './message-block';
-import ScenarioBlock from './scenario-block';
+import Const from './const';
 
 export default class TbSerializer {
   constructor(config) {
@@ -7,40 +6,33 @@ export default class TbSerializer {
     this.colorStack = [];
   }
 
-  serialize(blockList, option = {}) {
-    if (blockList.length == 0) {
-      return '';
-    }
-
+  serialize(root, option = {}) {
     let result = [];
     const varNo = option.varNo ? option.varNo : this.config.varNo;
 
-    // TODO 判定の仕方を考える
-    if (blockList[0] instanceof ScenarioBlock) {
-      // シナリオブロック有り
-      blockList.forEach((scenarioBlock) => {
-        result = result.concat(this._serializeScenarioBlock(scenarioBlock, varNo));
-      });
-    } else {
-      // シナリオブロック無し
-      result = result.concat(this._serializeMessageBlock(blockList));
-    }
+    result = result.concat(this._serializeScenarioBlock(root, varNo));
 
     return result.join("\n");
   }
 
   _serializeScenarioBlock(scenarioBlock, varNo) {
     let result = [];
-    result.push(`If(01, ${varNo}, 0, ${scenarioBlock.no}, 0, 0)`);
+
     scenarioBlock.child.forEach((child) => {
-      if(Array.isArray(child)) {
-        result = result.concat(this._serializeMessageBlock(child));
+      if(child.type === Const.block_type.scenario) {
+        const nextVarNo = scenarioBlock.no < 1 ? varNo : varNo + 1;
+        result = result.concat(this._serializeScenarioBlock(child, nextVarNo));
       } else {
-        result = result.concat(this._serializeScenarioBlock(child, varNo + 1));
+        result = result.concat(this._serializeMessageBlock(child));
       }
     });
-    result.push('Exit');
-    result.push('EndIf');
+
+    if (scenarioBlock.no > 0) {
+      // nested block
+      result.unshift(`If(01, ${varNo}, 0, ${scenarioBlock.no}, 0, 0)`);
+      result.push('Exit');
+      result.push('EndIf');
+    }
 
     return result;
   }

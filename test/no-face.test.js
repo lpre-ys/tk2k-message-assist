@@ -17,8 +17,9 @@ describe('ScenarioParser', () => {
           Test message 2`;
           const ret = parser.parse(text);
 
-          assert.equal(ret.length, 1);
-          const block = ret[0];
+          assert(ret.type === 'scenario');
+          assert.equal(ret.child[0].length, 1);
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
           assert(block.messageList[0].comments[0], 'comment');
@@ -31,8 +32,8 @@ describe('ScenarioParser', () => {
           Test message 4`;
           const ret = parser.parse(text);
 
-          assert.equal(ret.length, 1);
-          const block = ret[0];
+          assert.equal(ret.child[0].length, 1);
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert(block.messageList[0].line[0] == 'Test message');
           assert(block.messageList[0].line[1] == 'Test message 2');
@@ -50,8 +51,8 @@ describe('ScenarioParser', () => {
           Test message 4`;
           const ret = parser.parse(text);
 
-          assert.equal(ret.length, 1);
-          const block = ret[0];
+          assert.equal(ret.child[0].length, 1);
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert(block.messageList[0].line[0] == 'Test message');
           assert(block.messageList[0].line[1] == 'Test message 2');
@@ -69,8 +70,8 @@ describe('ScenarioParser', () => {
           Test message 4`;
           const ret = parser.parse(text);
 
-          assert.equal(ret.length, 1);
-          const block = ret[0];
+          assert.equal(ret.child[0].length, 1);
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert(block.messageList[0].line[0] == 'Test message');
           assert(block.messageList[0].line[1] == 'Test message 2');
@@ -87,8 +88,8 @@ describe('ScenarioParser', () => {
           const text = `Test message`;
           const ret = parser.parse(text);
 
-          assert.equal(ret.length, 1);
-          const block = ret[0];
+          assert.equal(ret.child[0].length, 1);
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message']);
         });
@@ -96,7 +97,7 @@ describe('ScenarioParser', () => {
           const text = `    Test message    `;
           const ret = parser.parse(text);
 
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message']);
         });
@@ -105,7 +106,7 @@ describe('ScenarioParser', () => {
     `;
           const ret = parser.parse(text);
 
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message']);
         });
@@ -114,7 +115,7 @@ describe('ScenarioParser', () => {
           `;
           const ret = parser.parse(text);
 
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message']);
         });
@@ -125,7 +126,7 @@ describe('ScenarioParser', () => {
                         Test message 2`;
           const ret = parser.parse(text);
 
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
         });
@@ -133,7 +134,7 @@ describe('ScenarioParser', () => {
           const text = `test->test->test->
                         Test message 2`;
           const ret = parser.parse(text);
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert(block.messageList[0].line[0] == 'test->test->test->');
           assert(block.messageList[0].line[1] == 'Test message 2');
         });
@@ -145,7 +146,7 @@ describe('ScenarioParser', () => {
                         Test message 3`;
           const ret = parser.parse(text);
 
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
           assert.deepEqual(block.messageList[1].line, ['Test message 3']);
@@ -158,7 +159,7 @@ describe('ScenarioParser', () => {
                         Test message 3`;
           const ret = parser.parse(text);
 
-          const block = ret[0];
+          const block = ret.child[0][0];
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message']);
           assert.deepEqual(block.messageList[1].line, ['Test message 3']);
@@ -171,7 +172,7 @@ describe('ScenarioParser', () => {
                           Test message 2
                           Test message 3`;
             const ret = parser.parse(text);
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message']);
             assert.deepEqual(block.messageList[1].line, ['Test message 2', 'Test message 3']);
@@ -181,7 +182,7 @@ describe('ScenarioParser', () => {
 
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message<wait></wait>wait message']);
           });
@@ -190,7 +191,7 @@ describe('ScenarioParser', () => {
 
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message<q_wait></q_wait>q_wait message']);
           });
@@ -200,7 +201,7 @@ describe('ScenarioParser', () => {
             const text = `Test message <red>RED!</red>`;
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED!</red>']);
           });
@@ -209,7 +210,7 @@ describe('ScenarioParser', () => {
             Test message 2 RED-END</red> normal message`;
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2 RED-END</red> normal message']);
           });
@@ -219,7 +220,7 @@ describe('ScenarioParser', () => {
             Test message 3 END`;
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2 <red>2nd RED-START</red></red>']);
             assert.deepEqual(block.messageList[1].line, ['<red>Test message 3 END</red>']);
@@ -230,7 +231,7 @@ describe('ScenarioParser', () => {
             Test message 3 RED-END</red> normal message`;
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2</red>']);
             assert.deepEqual(block.messageList[1].line, ['<red>Test message 3 RED-END</red> normal message']);
@@ -241,7 +242,7 @@ describe('ScenarioParser', () => {
             YELLOW-END</yellow>Test message 3 RED-END</red> normal message`;
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2<yellow>YELLOW-START<green>GREEN</green></yellow></red>']);
             assert.deepEqual(block.messageList[1].line, ['<red><yellow>YELLOW-END</yellow>Test message 3 RED-END</red> normal message']);
@@ -254,7 +255,7 @@ describe('ScenarioParser', () => {
             Normal message 3`;
             const ret = parser.parse(text);
 
-            const block = ret[0];
+            const block = ret.child[0][0];
             assert.equal(block.face, false);
             assert.deepEqual(block.messageList[0].line, ['Test message <red>RED-START', 'Test message 2</red>']);
             assert.deepEqual(block.messageList[1].line, ['<red>Test message 3 RED-END</red> normal message', 'Normal message 2']);
