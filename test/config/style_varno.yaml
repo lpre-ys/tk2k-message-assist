@@ -1,0 +1,11 @@
+style:
+  display:
+    name:
+      prefix: '【'
+      suffix: '】'
+      colorScope: 'outer'
+    lineLimit: 2
+  varNo: 87
+color:
+  yellow: 3
+  red: 4

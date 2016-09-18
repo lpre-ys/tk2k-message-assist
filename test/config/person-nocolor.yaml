@@ -1,0 +1,10 @@
+person:
+  テスト君:
+    name: テスト１
+    faces:
+      普通:
+        filename: test1.png
+        number: 1
+      笑:
+        filename: test1.png
+        number: 2

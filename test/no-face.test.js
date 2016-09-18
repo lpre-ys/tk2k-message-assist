@@ -129,6 +129,15 @@ describe('ScenarioParser', () => {
           assert.equal(block.face, false);
           assert.deepEqual(block.messageList[0].line, ['Test message', 'Test message 2']);
         });
+        it('>マークが単体で有った場合、次の行が正しく表示されること', () => {
+          const text = `test->test->test->
+                        Test message 2`;
+          const ret = parser.parse(text);
+          const block = ret[0];
+          console.log(block);
+          assert(block.messageList[0].line[0] == 'test->test->test->');
+          assert(block.messageList[0].line[1] == 'Test message 2');
+        });
       });
       describe('3 line text', () => {
         it('normal', () => {

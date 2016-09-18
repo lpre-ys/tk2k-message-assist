@@ -5,6 +5,18 @@ import ScenarioParser from '../src/scenario-parser';
 describe('ScenarioParser', () => {
   let parser;
   describe('useFace', () => {
+    it('no color', () => {
+      const style = fs.readFileSync('./test/config/style.yaml');
+      const person = [];
+      person.push(fs.readFileSync('./test/config/person-nocolor.yaml'));
+      parser = new ScenarioParser(style, person);
+
+      const text = `[テスト君_普通]
+      テストメッセージです。`;
+      const ret = parser.parse(text);
+      const block = ret[0];
+      assert(block.face.name == '【テスト１】');
+    });
     describe('2 limit line', () => {
       beforeEach(() => {
         const style = fs.readFileSync('./test/config/style.yaml');
