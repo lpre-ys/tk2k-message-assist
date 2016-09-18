@@ -23,8 +23,6 @@ export default class ScenarioParser {
     this.parsedMessages = false;
   }
   parse(input) {
-    let result;
-
     // trimと配列化
     const textList = input.split("\n").map((value) => {
       return value.trim();
@@ -60,7 +58,6 @@ export default class ScenarioParser {
         }
       });
 
-      result = root;
     } else {
       // シナリオブロック無しの場合
       root.child.push(this._textParse(textList));
@@ -79,7 +76,6 @@ export default class ScenarioParser {
   }
 
   _textParse(textList) {
-    // TODO 以後を内部メソッドに変更する
     // 継続タグの初期化
     this.continueTag = '';
 

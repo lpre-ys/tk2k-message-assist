@@ -54,7 +54,7 @@ export default class Config {
     if (found !== null) {
       faceKey = found[1];
     }
-    const ret = this._config.face[faceKey] ? Object.assign({}, this._config.face[faceKey]) : false;
+    let ret = this._config.face[faceKey] ? Object.assign({}, this._config.face[faceKey]) : false;
 
     if (found !== null) {
       const placeSettings = found[2].split(',');
@@ -67,6 +67,19 @@ export default class Config {
         ret.pos = false;
       } else if (placeSettings.includes(Const.face_place.pos.right)) {
         ret.pos = true;
+      }
+    }
+
+    // 名前フォーマットだけ利用する処理追加
+    if (!ret) {
+      const charName = faceKey.substr(0, faceKey.indexOf('_'));
+      const tmpFaceKey = Object.keys(this._config.face).find((v) => {
+        return v.startsWith(charName);
+      });
+      if (tmpFaceKey) {
+        ret = Object.assign({}, this._config.face[tmpFaceKey]);
+        ret.filename = false;
+        ret.number = -1;
       }
     }
 

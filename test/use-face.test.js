@@ -44,6 +44,25 @@ describe('ScenarioParser', () => {
           assert.deepEqual(block.messageList[0].line, ['テストメッセージです。']);
         });
       });
+      describe('キャラ名のみ合致した場合、名前フォーマットのみ利用する', () => {
+        let ret;
+        beforeEach(() => {
+          const text = `[テスト君_none]
+          顔無し、名前色有り`;
+          ret = parser.parse(text);
+        });
+        it('顔設定', () => {
+          assert(ret.child[0].length == 1);
+          const block = ret.child[0][0];
+          assert(!block.face.filename);
+          assert(block.face.number < 0);
+          assert(block.face.name == '<yellow>【テスト１】</yellow>');
+        });
+        it('message', () => {
+          const block = ret.child[0][0];
+          assert.deepEqual(block.messageList[0].line, ['顔無し、名前色有り']);
+        });
+      });
       describe('2face 1line', () => {
         let ret;
         beforeEach(() => {
