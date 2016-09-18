@@ -1,3 +1,5 @@
+import Const from './const';
+
 export default class MessageBlock {
   constructor(face) {
     this.face = face || false;
@@ -8,5 +10,9 @@ export default class MessageBlock {
   }
   hasMessage() {
     return this.messageList.length > 0;
+  }
+
+  get type() {
+    return Const.block_type.message;
   }
 }

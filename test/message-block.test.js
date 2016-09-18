@@ -11,4 +11,8 @@ describe('MessageBlock', () => {
     const block = new MessageBlock(false);
     assert(block.hasMessage() == false);
   });
+  it('typeがmessageであること', () => {
+    const block = new MessageBlock(false);
+    assert(block.type === 'message');
+  });
 });

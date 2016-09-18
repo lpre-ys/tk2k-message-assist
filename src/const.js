@@ -7,6 +7,10 @@ const Const = {
       right: '右'
     },
     mirror: '反転'
+  },
+  block_type: {
+    scenario: 'scenario',
+    message: 'message'
   }
 };
 

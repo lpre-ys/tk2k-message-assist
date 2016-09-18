@@ -23,15 +23,17 @@ export default class ScenarioParser {
     this.parsedMessages = false;
   }
   parse(input) {
+    let result;
+
     // trimと配列化
     const textList = input.split("\n").map((value) => {
       return value.trim();
     });
 
     // シナリオブロック変換
+    const root = new ScenarioBlock(0, false, 'root');
     if ((new RegExp(blockRegExpStr, 'mg')).test(input)) {
-      // ブロック変換
-      const root = new ScenarioBlock(0, false, 'root');
+      // 子ブロック有り
       const tmp = [];
       const blockRegExp = new RegExp(blockRegExpStr);
       let target = root;
@@ -58,11 +60,15 @@ export default class ScenarioParser {
         }
       });
 
-      return root.child;
+      result = root;
     } else {
       // シナリオブロック無しの場合
-      return this._textParse(textList);
+      root.child.push(this._textParse(textList));
     }
+
+    this.parsedMessages = root;
+
+    return root;
   }
 
   serialize() {
@@ -139,8 +145,6 @@ export default class ScenarioParser {
     if (block.hasMessage()) {
       result.push(block);
     }
-
-    this.parsedMessages = result;
 
     return result;
   }

@@ -13,8 +13,8 @@ describe('ScenarioParser', () => {
       const script = `\\     Test Message`;
       const ret = parser.parse(script);
 
-      assert.equal(ret.length, 1);
-      const block = ret[0];
+      assert.equal(ret.child[0].length, 1);
+      const block = ret.child[0][0];
       assert.equal(block.face, false);
       assert.deepEqual(block.messageList[0].line, ['\\     Test Message']);
 
@@ -26,8 +26,8 @@ describe('ScenarioParser', () => {
       const script = `Test Message   \\`;
       const ret = parser.parse(script);
 
-      assert.equal(ret.length, 1);
-      const block = ret[0];
+      assert.equal(ret.child[0].length, 1);
+      const block = ret.child[0][0];
       assert.equal(block.face, false);
       assert.deepEqual(block.messageList[0].line, ['Test Message   \\']);
 
@@ -39,8 +39,8 @@ describe('ScenarioParser', () => {
       const script = `Test Message \\<yellow>yellow`;
       const ret = parser.parse(script);
 
-      assert.equal(ret.length, 1);
-      const block = ret[0];
+      assert.equal(ret.child[0].length, 1);
+      const block = ret.child[0][0];
       assert.equal(block.face, false);
       assert.deepEqual(block.messageList[0].line, ['Test Message \\<yellow>yellow']);
 
@@ -53,8 +53,8 @@ describe('ScenarioParser', () => {
         const script = `\\<pb>Test Message PageBreak`;
         const ret = parser.parse(script);
 
-        assert.equal(ret.length, 1);
-        const block = ret[0];
+        assert.equal(ret.child[0].length, 1);
+        const block = ret.child[0][0];
         assert.equal(block.face, false);
         assert.deepEqual(block.messageList[0].line, ['\\<pb>Test Message PageBreak']);
 
@@ -66,8 +66,8 @@ describe('ScenarioParser', () => {
         const script = `Test Message \\<pb>PageBreak`;
         const ret = parser.parse(script);
 
-        assert.equal(ret.length, 1);
-        const block = ret[0];
+        assert.equal(ret.child[0].length, 1);
+        const block = ret.child[0][0];
         assert.equal(block.face, false);
         assert.deepEqual(block.messageList[0].line, ['Test Message \\<pb>PageBreak']);
 
@@ -79,8 +79,8 @@ describe('ScenarioParser', () => {
         const script = `Test Message PageBreak\\<pb>`;
         const ret = parser.parse(script);
 
-        assert.equal(ret.length, 1);
-        const block = ret[0];
+        assert.equal(ret.child[0].length, 1);
+        const block = ret.child[0][0];
         assert.equal(block.face, false);
         assert.deepEqual(block.messageList[0].line, ['Test Message PageBreak\\<pb>']);
 
@@ -93,8 +93,8 @@ describe('ScenarioParser', () => {
         next line`;
         const ret = parser.parse(script);
 
-        assert.equal(ret.length, 1);
-        const block = ret[0];
+        assert.equal(ret.child[0].length, 1);
+        const block = ret.child[0][0];
         assert.equal(block.face, false);
         assert.deepEqual(block.messageList[0].line, ['PageBreak tag: \\<pb> TestMessage']);
         assert.deepEqual(block.messageList[1].line, ['next line']);
@@ -108,8 +108,8 @@ describe('ScenarioParser', () => {
       const script = `Escape mark is \\\\`;
       const ret = parser.parse(script);
 
-      assert.equal(ret.length, 1);
-      const block = ret[0];
+      assert.equal(ret.child[0].length, 1);
+      const block = ret.child[0][0];
       assert.equal(block.face, false);
       assert.deepEqual(block.messageList[0].line, ['Escape mark is \\\\']);
 
