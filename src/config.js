@@ -71,7 +71,7 @@ export default class Config {
     }
 
     // 名前フォーマットだけ利用する処理追加
-    if (!ret) {
+    if (!ret && faceKey.includes('_')) {
       const charName = faceKey.substr(0, faceKey.indexOf('_'));
       const tmpFaceKey = Object.keys(this._config.face).find((v) => {
         return v.startsWith(charName);

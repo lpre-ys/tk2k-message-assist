@@ -63,6 +63,23 @@ describe('ScenarioParser', () => {
           assert.deepEqual(block.messageList[0].line, ['顔無し、名前色有り']);
         });
       });
+      describe('キャラ名無しで合致しない場合、名前を表記しない', () => {
+        let ret;
+        beforeEach(() => {
+          const text = `[none]
+          顔無し、名前無し`;
+          ret = parser.parse(text);
+        });
+        it('顔設定', () => {
+          assert(ret.child[0].length == 1);
+          const block = ret.child[0][0];
+          assert(!block.face);
+        });
+        it('message', () => {
+          const block = ret.child[0][0];
+          assert.deepEqual(block.messageList[0].line, ['顔無し、名前無し']);
+        });
+      });
       describe('2face 1line', () => {
         let ret;
         beforeEach(() => {
