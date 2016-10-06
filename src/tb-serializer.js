@@ -43,12 +43,18 @@ export default class TbSerializer {
     messageBlockList.forEach((messageBlock) => {
       // 顔グラ関連
       let faceMessage = false;
-      if (messageBlock.face && messageBlock.face.filename) {
-        showFace = true;
-        const posCode = messageBlock.face.pos ? 1 : 0;
-        const mirrorCode = messageBlock.face.mirror ? 1 : 0;
-        result.push(`Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})`);
+      if (messageBlock.face) {
         faceMessage = this._toTbScript(messageBlock.face.name);
+        if (messageBlock.face.filename) {
+          showFace = true;
+          const posCode = messageBlock.face.pos ? 1 : 0;
+          const mirrorCode = messageBlock.face.mirror ? 1 : 0;
+          result.push(`Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})`);
+        } else {
+          showFace = false;
+          // 顔グラを非表示に
+          result.push('Faice(0, 0, 0)');
+        }
       } else if (showFace) {
         showFace = false;
         // 顔グラを非表示に
