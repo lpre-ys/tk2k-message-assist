@@ -43,7 +43,7 @@ export default class TbSerializer {
     messageBlockList.forEach((messageBlock) => {
       // 顔グラ関連
       let faceMessage = false;
-      if (messageBlock.face) {
+      if (messageBlock.face && messageBlock.face.filename) {
         showFace = true;
         const posCode = messageBlock.face.pos ? 1 : 0;
         const mirrorCode = messageBlock.face.mirror ? 1 : 0;
