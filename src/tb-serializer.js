@@ -39,7 +39,7 @@ export default class TbSerializer {
 
   _serializeMessageBlock(messageBlockList) {
     const result = [];
-    let showFace = false;
+    let showFace = true;
     messageBlockList.forEach((messageBlock) => {
       // 顔グラ関連
       let faceMessage = false;
