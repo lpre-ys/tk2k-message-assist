@@ -79,7 +79,7 @@ export default class JsSerializer {
         if (this.config.isFlash) {
           line = line.map((v) => {return `\\>${v}`;});
         }
-        result.push(`tkMock.raw('Text("${line.join(cChar.br).replace('/\\/g', '\\\\')}")');`);
+        result.push(`tkMock.raw('Text("${line.join(cChar.br).replace(/\\/g, '\\\\')}")');`);
       });
     });
 
