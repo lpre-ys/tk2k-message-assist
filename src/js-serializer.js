@@ -49,21 +49,21 @@ export default class JsSerializer {
           showFace = true;
           const posCode = messageBlock.face.pos ? 1 : 0;
           const mirrorCode = messageBlock.face.mirror ? 1 : 0;
-          result.push(`tkMock.raw('Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})')`);
+          result.push(`tkMock.raw('Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})');`);
         } else {
           showFace = false;
           // 顔グラを非表示に
-          result.push('tkMock.raw(`Faice(0, 0, 0)`)');
+          result.push('tkMock.raw(`Faice(0, 0, 0)`);');
         }
       } else if (showFace) {
         showFace = false;
         // 顔グラを非表示に
-        result.push('tkMock.raw(`Faice(0, 0, 0)`)');
+        result.push('tkMock.raw(`Faice(0, 0, 0)`);');
       }
       messageBlock.messageList.forEach((message) => {
         // コメント行の出力
         message.comments.forEach((comment) => {
-          result.push(`tkMock.comment('${comment}')`);
+          result.push(`tkMock.comment('${comment}');`);
         });
         // タグ置換
         this.colorStack = []; // 色タグのスタックリセット
@@ -79,7 +79,7 @@ export default class JsSerializer {
         if (this.config.isFlash) {
           line = line.map((v) => {return `\\>${v}`;});
         }
-        result.push(`tkMock.raw('Text("${line.join(cChar.br)}")')`);
+        result.push(`tkMock.raw('Text("${line.join(cChar.br).replace('/\\/g', '\\\\')}")');`);
       });
     });
 
