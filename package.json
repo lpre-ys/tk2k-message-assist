@@ -1,6 +1,6 @@
 {
   "name": "tk2k-message-assist",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "tk2k-message-assist ====",
   "main": "lib/index.js",
   "scripts": {

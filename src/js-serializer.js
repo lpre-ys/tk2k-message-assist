@@ -30,7 +30,7 @@ export default class JsSerializer {
     if (scenarioBlock.no > 0) {
       // nested block
       result.unshift(`if (_text${varNo} == ${scenarioBlock.no}) {`);
-      result.push('tkMock.Raw(`Exit`)');
+      result.push('tkMock.raw(`Exit`)');
       result.push('}');
     }
 
