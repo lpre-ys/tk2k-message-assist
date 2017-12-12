@@ -3,6 +3,7 @@ import Message from './message';
 import MessageBlock from './message-block';
 import Config from './config';
 import TbSerializer from './tb-serializer';
+import JsSerializer from './js-serializer';
 
 // ブロック構文チェック用正規表現
 const blockRegExpStr = '(?:^\{|^(.*[^\\\\])\\{)';
@@ -68,11 +69,11 @@ export default class ScenarioParser {
     return root;
   }
 
-  serialize() {
+  serialize(isJs = false) {
     if (!this.parsedMessages) {
       return '';
     }
-    return this.serializer.serialize(this.parsedMessages);
+    return isJs ? this.JsSerializer.serialize(this.parsedMessages) : this.serializer.serialize(this.parsedMessages);
   }
 
   _textParse(textList) {

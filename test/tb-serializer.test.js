@@ -29,7 +29,8 @@ describe('TbSerializer', () => {
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("TestMessage")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("TestMessage")`);
       });
       it('2 line 1 window', () => {
         const messageBlock = new MessageBlock();
@@ -38,7 +39,8 @@ describe('TbSerializer', () => {
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("TestMessage\\kTestMessage2")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("TestMessage\\kTestMessage2")`);
       });
       it('2 window', () => {
         const messageBlock = new MessageBlock();
@@ -48,7 +50,8 @@ describe('TbSerializer', () => {
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("TestMessage\\kTestMessage2")
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("TestMessage\\kTestMessage2")
 Text("TestMessage3")`);
       });
     });
@@ -126,7 +129,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("normal\\C[3]yellow\\C[0]normal")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("normal\\C[3]yellow\\C[0]normal")`);
       });
       it('2 tag', () => {
         const messageBlock = new MessageBlock();
@@ -135,7 +139,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("normal\\C[3]yellow\\C[4]red\\C[3]\\C[0]normal")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("normal\\C[3]yellow\\C[4]red\\C[3]\\C[0]normal")`);
       });
       it('複数行にまたがるタグ', () => {
         const messageBlock = new MessageBlock();
@@ -144,7 +149,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert(ret == `Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message")`);
+        assert(ret == `Faice(0, 0, 0)
+Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message")`);
       });
     });
     describe('control tag', () => {
@@ -155,7 +161,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("stop before\\!after")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("stop before\\!after")`);
       });
       it('wait', () => {
         const messageBlock = new MessageBlock();
@@ -164,7 +171,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("wait before\\|after")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("wait before\\|after")`);
       });
       it('q_wait', () => {
         const messageBlock = new MessageBlock();
@@ -173,7 +181,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("quarter wait before\\.after")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("quarter wait before\\.after")`);
       });
       it('close', () => {
         const messageBlock = new MessageBlock();
@@ -182,7 +191,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("close before\\^after")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("close before\\^after")`);
       });
       it('flash', () => {
         const messageBlock = new MessageBlock();
@@ -191,7 +201,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Text("normal\\>flash\\<normal")`);
+        assert.equal(ret, `Faice(0, 0, 0)
+Text("normal\\>flash\\<normal")`);
       });
     });
   });
@@ -208,6 +219,7 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage")
 Exit
 EndIf`);
@@ -228,10 +240,12 @@ EndIf`);
         const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage")
 Exit
 EndIf
 If(01, 1, 0, 39, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage2")
 Exit
 EndIf`);
@@ -247,6 +261,7 @@ EndIf`);
         const ret = serializer.serialize(rootBlock, {varNo: 39});
 
         assert.equal(ret, `If(01, 39, 0, 42, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage")
 Exit
 EndIf`);
@@ -265,6 +280,7 @@ EndIf`);
         const ret = serializer.serialize(rootBlock);
 
         assert.equal(ret, `If(01, 87, 0, 42, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage")
 Exit
 EndIf`);
@@ -291,10 +307,12 @@ EndIf`);
 
         assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
 If(01, 2, 0, 111, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage")
 Exit
 EndIf
 If(01, 2, 0, 222, 0, 0)
+Faice(0, 0, 0)
 Text("TestMessage2")
 Exit
 EndIf

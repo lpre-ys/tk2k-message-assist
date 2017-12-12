@@ -13,9 +13,6 @@
       "ecmaVersion": 6,
       "sourceType": "module"
     },
-    "ecmaFeatures": {
-      "modules": true
-    },
     "rules": {
       "comma-spacing": [2, {"before": false, "after": true}],
       "semi": [2, "always"],
@@ -24,4 +21,5 @@
       "space-before-function-paren" : [2, {"anonymous": "always", "named": "never"}],
       "no-unused-vars" : [1]
     }
+
 }
