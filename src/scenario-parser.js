@@ -21,6 +21,7 @@ export default class ScenarioParser {
       this.config.loadPersonYaml(face);
     });
     this.serializer = new TbSerializer(this.config);
+    this.jsSerializer = new JsSerializer(this.config);
     this.parsedMessages = false;
   }
   parse(input) {
@@ -73,7 +74,7 @@ export default class ScenarioParser {
     if (!this.parsedMessages) {
       return '';
     }
-    return isJs ? this.JsSerializer.serialize(this.parsedMessages) : this.serializer.serialize(this.parsedMessages);
+    return isJs ? this.jsSerializer.serialize(this.parsedMessages) : this.serializer.serialize(this.parsedMessages);
   }
 
   _textParse(textList) {
