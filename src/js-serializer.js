@@ -63,7 +63,8 @@ export default class JsSerializer {
       messageBlock.messageList.forEach((message) => {
         // コメント行の出力
         message.comments.forEach((comment) => {
-          result.push(`tkMock.comment('${comment}');`);
+          // コメントはJavaScriptのコメントとして出力する
+          result.push(`// ${comment}`);
         });
         // タグ置換
         this.colorStack = []; // 色タグのスタックリセット
