@@ -104,6 +104,7 @@ export default class TbSerializer {
         const tagData = part.substr(1, part.length - 2).split(' ');
         const tagName = tagData.shift();
         if (tagName ==='speed') {
+          console.log(text, tagName, tagData);
           // スピードタグ
           const value = tagData.find((v) => {
             return v.includes('value=');

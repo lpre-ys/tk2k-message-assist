@@ -6,9 +6,9 @@ import TbSerializer from './tb-serializer';
 import JsSerializer from './js-serializer';
 
 // ブロック構文チェック用正規表現
-const blockRegExpStr = '(?:^\{|^(.*[^\\\\])\\{)';
+const blockRegExpStr = '(?:^{|^(.*[^\\\\])\\{)';
 // 単独タグ正規表現
-const noEndTagRegExp = /<([a-z\-\_]+) \/>/g;
+const noEndTagRegExp = /<([a-z\-_]+) \/>/g;
 // 顔グラ変更命令正規表現
 const faceCommandRegExp = /^\[([^\]]+)]$/;
 
@@ -152,18 +152,18 @@ export default class ScenarioParser {
     const input = this.continueTag + textList.join("\n").replace(noEndTagRegExp, "<$1></$1>");
     // 継続タグのチェック
     const stack = [];
-    const tags = input.match(/.?<\/?[a-z\_\-]+>/g);
+    const tags = input.match(/.?<\/?[a-z0-9\-_ ='"]+>/g);
     if (tags) {
       tags.forEach((tag) => {
         if (tag.startsWith('\\')) {
           // エスケープ文字付きの場合対応しない
           return;
         }
-        tag = tag.replace(/.?(<\/?[a-z\_\-]+>)/, '$1');
+        tag = tag.replace(/.?(<\/?[a-z0-9\-_ ='"]+>)/, '$1');
         if (tag.startsWith('</')) {
           // 閉じタグ
           const lastTag = stack.pop(tag);
-          if (lastTag != tag.substr(2, tag.length - 3)) {
+          if (!tag.includes(lastTag.split(' ')[0])) {
             throw new Error(`タグの対応がおかしいです。: ${lastTag}`);
           }
         } else {
@@ -185,7 +185,7 @@ export default class ScenarioParser {
     }
 
     // 最終出力
-    const output = input + stack.reverse().map((v) => { return `</${v}>`; }).join('');
+    const output = input + stack.reverse().map((v) => { return `</${v.split(' ')[0]}>`; }).join('');
 
     return new Message(output.trim().split("\n"), comments);
   }

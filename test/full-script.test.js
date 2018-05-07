@@ -100,6 +100,34 @@ Exit
 EndIf`);
     });
   });
+  describe('Tags', () => {
+    it('speed', () => {
+      const input = `{
+  スピードタグのテストです
+  <speed value="20">20<speed value='5'>5</speed>20</speed>0<pb>
+  行またぎ<speed value=13>13開始
+  13終了</speed>normal
+}`;
+      // パース
+      const style = fs.readFileSync('./test/config/style_varno.yaml');
+      const person = [];
+      person.push(fs.readFileSync('./test/config/person1.yaml'));
+      person.push(fs.readFileSync('./test/config/person2.yaml'));
+      parser = new ScenarioParser(style, person);
+
+      parser.parse(input);
+
+      // シリアライズ
+      const ret = parser.serialize();
+
+      assert.equal(ret, `If(01, 87, 0, 1, 0, 0)
+Faice(0, 0, 0)
+Text("スピードタグのテストです\\k\\S[20]20\\S[5]5\\S[20]20\\S[0]0")
+Text("行またぎ\\S[13]13開始\\k13終了\\S[0]normal")
+Exit
+EndIf`);
+    });
+  });
   // describe('max line 2', () => {
   //   beforeEach(() => {
   //     parser = new ScenarioParser(2);
