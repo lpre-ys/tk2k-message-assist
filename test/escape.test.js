@@ -20,7 +20,7 @@ describe('ScenarioParser', () => {
 
       // serialize
       const tbscript = parser.serialize();
-      assert(tbscript == 'Text("     Test Message")');
+      assert(tbscript.includes('Text("     Test Message")'));
     });
     it('end of line', () => {
       const script = `Test Message   \\`;
@@ -33,7 +33,7 @@ describe('ScenarioParser', () => {
 
       // serialize
       const tbscript = parser.serialize();
-      assert(tbscript == 'Text("Test Message   ")');
+      assert(tbscript.includes('Text("Test Message   ")'));
     });
     it('before color tag', () => {
       const script = `Test Message \\<yellow>yellow`;
@@ -46,7 +46,7 @@ describe('ScenarioParser', () => {
 
       // serialize
       const tbscript = parser.serialize();
-      assert(tbscript == 'Text("Test Message <yellow>yellow")');
+      assert(tbscript.includes('Text("Test Message <yellow>yellow")'));
     });
     describe('before pb tag', () => {
       it('top', () => {
@@ -60,7 +60,7 @@ describe('ScenarioParser', () => {
 
         // serialize
         const tbscript = parser.serialize();
-        assert(tbscript == 'Text("<pb>Test Message PageBreak")');
+        assert(tbscript.includes('Text("<pb>Test Message PageBreak")'));
       });
       it('inner', () => {
         const script = `Test Message \\<pb>PageBreak`;
@@ -73,7 +73,7 @@ describe('ScenarioParser', () => {
 
         // serialize
         const tbscript = parser.serialize();
-        assert(tbscript == 'Text("Test Message <pb>PageBreak")');
+        assert(tbscript.includes('Text("Test Message <pb>PageBreak")'));
       });
       it('last', () => {
         const script = `Test Message PageBreak\\<pb>`;
@@ -86,7 +86,7 @@ describe('ScenarioParser', () => {
 
         // serialize
         const tbscript = parser.serialize();
-        assert(tbscript == 'Text("Test Message PageBreak<pb>")');
+        assert(tbscript.includes('Text("Test Message PageBreak<pb>")'));
       });
       it('mix', () => {
         const script = `PageBreak tag: \\<pb> TestMessage<pb>Hidden
@@ -101,7 +101,7 @@ describe('ScenarioParser', () => {
 
         // serialize
         const tbscript = parser.serialize();
-        assert(tbscript == "Text(\"PageBreak tag: <pb> TestMessage\")\nText(\"next line\")");
+        assert(tbscript.includes("Text(\"PageBreak tag: <pb> TestMessage\")\nText(\"next line\")"));
       });
     });
     it('2 escape mark to no change', () => {
@@ -115,7 +115,7 @@ describe('ScenarioParser', () => {
 
       // serialize
       const tbscript = parser.serialize();
-      assert(tbscript == 'Text("Escape mark is \\\\")');
+      assert(tbscript.includes('Text("Escape mark is \\\\")'));
     });
   });
 });

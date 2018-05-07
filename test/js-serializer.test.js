@@ -1,12 +1,12 @@
 import assert from 'power-assert';
 import fs from 'fs';
-import TbSerializer from '../src/tb-serializer';
+import JsSerializer from '../src/js-serializer';
 import Config from '../src/config';
 import MessageBlock from '../src/message-block';
 import Message from '../src/message';
 import ScenarioBlock from '../src/scenario-block';
 
-describe('TbSerializer', () => {
+describe('JsSerializer', () => {
   let serializer;
   let config;
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe('TbSerializer', () => {
     config.loadPersonYaml(fs.readFileSync('./test/config/person2.yaml'));
 
     // create instance
-    serializer = new TbSerializer(config);
+    serializer = new JsSerializer(config);
   });
   describe('serialize', () => {
     describe('no decoration', () => {
@@ -29,8 +29,8 @@ describe('TbSerializer', () => {
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("TestMessage")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage")\`);`);
       });
       it('2 line 1 window', () => {
         const messageBlock = new MessageBlock();
@@ -39,8 +39,8 @@ Text("TestMessage")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("TestMessage\\kTestMessage2")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage\\\\kTestMessage2")\`);`);
       });
       it('2 window', () => {
         const messageBlock = new MessageBlock();
@@ -50,9 +50,9 @@ Text("TestMessage\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("TestMessage\\kTestMessage2")
-Text("TestMessage3")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage\\\\kTestMessage2")\`);
+tkMock.raw(\`Text("TestMessage3")\`);`);
       });
     });
     describe('face', () => {
@@ -65,8 +65,8 @@ Text("TestMessage3")`);
           root.child.push([messageBlock]);
           const ret = serializer.serialize(root);
 
-          assert.equal(ret, `Faice("test1.png", 1, 1, 0)
-Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+          assert.equal(ret, `tkMock.raw(\`Faice("test1.png", 1, 1, 0)\`);
+tkMock.raw(\`Text("\\\\C[3]【テスト１】\\\\C[0]\\\\kTestMessage")\`);`);
         });
         it('左のとき0', () => {
           const faceConfig = config.getFace('テスト君_普通(左)');
@@ -76,8 +76,8 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
           root.child.push([messageBlock]);
           const ret = serializer.serialize(root);
 
-          assert.equal(ret, `Faice("test1.png", 1, 0, 0)
-Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+          assert.equal(ret, `tkMock.raw(\`Faice("test1.png", 1, 0, 0)\`);
+tkMock.raw(\`Text("\\\\C[3]【テスト１】\\\\C[0]\\\\kTestMessage")\`);`);
         });
       });
       describe('反転指定', () => {
@@ -89,8 +89,8 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
           root.child.push([messageBlock]);
           const ret = serializer.serialize(root);
 
-          assert.equal(ret, `Faice("test1.png", 1, 0, 1)
-Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+          assert.equal(ret, `tkMock.raw(\`Faice("test1.png", 1, 0, 1)\`);
+tkMock.raw(\`Text("\\\\C[3]【テスト１】\\\\C[0]\\\\kTestMessage")\`);`);
         });
       });
       it('1 face', () => {
@@ -101,8 +101,8 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice("test1.png", 1, 0, 0)
-Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
+        assert.equal(ret, `tkMock.raw(\`Faice("test1.png", 1, 0, 0)\`);
+tkMock.raw(\`Text("\\\\C[3]【テスト１】\\\\C[0]\\\\kTestMessage")\`);`);
       });
       it('2 face(2 messageBlock)', () => {
         const faceConfig1 = config.getFace('テスト君_普通');
@@ -115,10 +115,10 @@ Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")`);
         root.child.push([messageBlock1, messageBlock2]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice("test1.png", 1, 0, 0)
-Text("\\C[3]【テスト１】\\C[0]\\kTestMessage")
-Faice("test2.png", 2, 0, 0)
-Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
+        assert.equal(ret, `tkMock.raw(\`Faice("test1.png", 1, 0, 0)\`);
+tkMock.raw(\`Text("\\\\C[3]【テスト１】\\\\C[0]\\\\kTestMessage")\`);
+tkMock.raw(\`Faice("test2.png", 2, 0, 0)\`);
+tkMock.raw(\`Text("\\\\C[4]【テスト２】\\\\C[0]\\\\kTestMessage2")\`);`);
       });
     });
     describe('color', () => {
@@ -129,8 +129,8 @@ Text("\\C[4]【テスト２】\\C[0]\\kTestMessage2")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("normal\\C[3]yellow\\C[0]normal")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("normal\\\\C[3]yellow\\\\C[0]normal")\`);`);
       });
       it('2 tag', () => {
         const messageBlock = new MessageBlock();
@@ -139,8 +139,8 @@ Text("normal\\C[3]yellow\\C[0]normal")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("normal\\C[3]yellow\\C[4]red\\C[3]\\C[0]normal")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("normal\\\\C[3]yellow\\\\C[4]red\\\\C[3]\\\\C[0]normal")\`);`);
       });
       it('複数行にまたがるタグ', () => {
         const messageBlock = new MessageBlock();
@@ -149,8 +149,8 @@ Text("normal\\C[3]yellow\\C[4]red\\C[3]\\C[0]normal")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert(ret == `Faice(0, 0, 0)
-Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message")`);
+        assert(ret == `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("Test message \\\\C[4]RED-START\\\\kTest message 2 RED-END\\\\C[0] normal message")\`);`);
       });
     });
     describe('control tag', () => {
@@ -161,8 +161,8 @@ Text("Test message \\C[4]RED-START\\kTest message 2 RED-END\\C[0] normal message
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("stop before\\!after")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("stop before\\\\!after")\`);`);
       });
       it('wait', () => {
         const messageBlock = new MessageBlock();
@@ -171,8 +171,8 @@ Text("stop before\\!after")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("wait before\\|after")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("wait before\\\\|after")\`);`);
       });
       it('q_wait', () => {
         const messageBlock = new MessageBlock();
@@ -181,8 +181,8 @@ Text("wait before\\|after")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("quarter wait before\\.after")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("quarter wait before\\\\.after")\`);`);
       });
       it('close', () => {
         const messageBlock = new MessageBlock();
@@ -191,8 +191,8 @@ Text("quarter wait before\\.after")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("close before\\^after")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("close before\\\\^after")\`);`);
       });
       it('flash', () => {
         const messageBlock = new MessageBlock();
@@ -201,8 +201,8 @@ Text("close before\\^after")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("normal\\>flash\\<normal")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("normal\\\\>flash\\\\<normal")\`);`);
       });
       it('speed-single', () => {
         const messageBlock = new MessageBlock();
@@ -211,8 +211,8 @@ Text("normal\\>flash\\<normal")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("normal\\S[20]speed\\S[0]normal")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("normal\\\\S[20]speed\\\\S[0]normal")\`);`);
       });
       it('speed-nested', () => {
         const messageBlock = new MessageBlock();
@@ -221,8 +221,8 @@ Text("normal\\S[20]speed\\S[0]normal")`);
         root.child.push([messageBlock]);
         const ret = serializer.serialize(root);
 
-        assert.equal(ret, `Faice(0, 0, 0)
-Text("normal\\S[10]speed10\\S[20]speed20\\S[10]speed10\\S[0]normal")`);
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("normal\\\\S[10]speed10\\\\S[20]speed20\\\\S[10]speed10\\\\S[0]normal")\`);`);
       });
     });
   });
@@ -238,11 +238,10 @@ Text("normal\\S[10]speed10\\S[20]speed20\\S[10]speed10\\S[0]normal")`);
 
         const ret = serializer.serialize(rootBlock);
 
-        assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage")
-Exit
-EndIf`);
+        assert.equal(ret, `if (_text1 == 42) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage")\`);
+}`);
       });
       it('2block', () => {
         const messageBlock = new MessageBlock();
@@ -259,16 +258,14 @@ EndIf`);
 
         const ret = serializer.serialize(rootBlock);
 
-        assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage")
-Exit
-EndIf
-If(01, 1, 0, 39, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage2")
-Exit
-EndIf`);
+        assert.equal(ret, `if (_text1 == 42) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage")\`);
+}
+if (_text1 == 39) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage2")\`);
+}`);
       });
       it('varNoの読み取り(オプション)', () => {
         const messageBlock = new MessageBlock();
@@ -280,11 +277,10 @@ EndIf`);
 
         const ret = serializer.serialize(rootBlock, {varNo: 39});
 
-        assert.equal(ret, `If(01, 39, 0, 42, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage")
-Exit
-EndIf`);
+        assert.equal(ret, `if (_text39 == 42) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage")\`);
+}`);
       });
       it('varNoの読み取り(yaml)', () => {
         const style = fs.readFileSync('./test/config/style_varno.yaml');
@@ -299,11 +295,10 @@ EndIf`);
 
         const ret = serializer.serialize(rootBlock);
 
-        assert.equal(ret, `If(01, 87, 0, 42, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage")
-Exit
-EndIf`);
+        assert.equal(ret, `if (_text87 == 42) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage")\`);
+}`);
 
       });
     });
@@ -325,19 +320,16 @@ EndIf`);
 
         const ret = serializer.serialize(rootBlock);
 
-        assert.equal(ret, `If(01, 1, 0, 42, 0, 0)
-If(01, 2, 0, 111, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage")
-Exit
-EndIf
-If(01, 2, 0, 222, 0, 0)
-Faice(0, 0, 0)
-Text("TestMessage2")
-Exit
-EndIf
-Exit
-EndIf`);
+        assert.equal(ret, `if (_text1 == 42) {
+if (_text2 == 111) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage")\`);
+}
+if (_text2 == 222) {
+tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("TestMessage2")\`);
+}
+}`);
       });
     });
   });

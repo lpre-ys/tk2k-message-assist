@@ -4,6 +4,7 @@ export default class JsSerializer {
   constructor(config) {
     this.config = config;
     this.colorStack = [];
+    this.speedStack = [];
   }
 
   serialize(root, option = {}) {
@@ -49,7 +50,7 @@ export default class JsSerializer {
           showFace = true;
           const posCode = messageBlock.face.pos ? 1 : 0;
           const mirrorCode = messageBlock.face.mirror ? 1 : 0;
-          result.push(`tkMock.raw('Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})');`);
+          result.push(`tkMock.raw(\`Faice("${messageBlock.face.filename}", ${messageBlock.face.number}, ${posCode}, ${mirrorCode})\`);`);
         } else {
           showFace = false;
           // 顔グラを非表示に
@@ -68,6 +69,7 @@ export default class JsSerializer {
         });
         // タグ置換
         this.colorStack = []; // 色タグのスタックリセット
+        this.speedStack = [];
         let line = message.line.map((text)=> {
           return this._toTbScript(text);
         });
@@ -80,7 +82,7 @@ export default class JsSerializer {
         if (this.config.isFlash) {
           line = line.map((v) => {return `\\>${v}`;});
         }
-        result.push(`tkMock.raw('Text("${line.join(cChar.br).replace(/\\/g, '\\\\')}")');`);
+        result.push(`tkMock.raw(\`Text("${line.join(cChar.br).replace(/\\/g, '\\\\')}")\`);`);
       });
     });
 
@@ -89,17 +91,28 @@ export default class JsSerializer {
 
   _toTbScript(text) {
     // タグとメッセージに分解
-    let parts = text.split(/(\\?<\/?[a-z\-\_]+>)/);
+    let parts = text.split(/(\\?<\/?[a-z0-9\-_ ='"]+>)/);
     if (parts.length == 1) {
       // 変換無し
       return this._removeEscapeChar(text);
     }
     // タグの変換
     let prevColor = 0;
+    let prevSpeed = 0;
     parts = parts.map((part) => {
-      if (/^<[a-z\-\_]+>$/.test(part)) {
+      if (/^<[a-z0-9\-_ ='"]+>$/.test(part)) {
         // 開始タグ
-        const tagName = part.substr(1, part.length - 2);
+        const tagData = part.substr(1, part.length - 2).split(' ');
+        const tagName = tagData.shift();
+        if (tagName ==='speed') {
+          // スピードタグ
+          const value = tagData.find((v) => {
+            return v.includes('value=');
+          }).match(/[0-9]+/)[0];
+          this.speedStack.push(prevSpeed);
+          prevSpeed = value;
+          return `${cChar.speed}[${value}]`;
+        }
         const colorNumber = this.config.getColorNumber(tagName);
         if (colorNumber) {
           // 色タグ
@@ -109,13 +122,17 @@ export default class JsSerializer {
         }
         // 制御タグ
         return `${this._getCChar(tagName)}`;
-      } else if (/^<\/[a-z\-\_]+>$/.test(part)) {
+      } else if (/^<\/[a-z\-_]+>$/.test(part)) {
         // 閉じタグ
         const tagName = part.substr(2, part.length - 3);
         if (!this.config.getColorNumber(tagName) === false) {
           // 色タグ
           prevColor = this.colorStack.pop();
           return `${cChar.color}[${prevColor}]`;
+        } else if (tagName === 'speed') {
+          // スピードタグ
+          prevSpeed = this.speedStack.pop();
+          return `${cChar.speed}[${prevSpeed}]`;
         } else if (cNormalTags.includes(tagName)) {
           // 閉じタグ有りの制御タグ
           return `${this._getCChar(tagName + '_end')}`;
@@ -150,7 +167,8 @@ const cChar = {
   q_wait: '\\.',
   close: '\\^',
   flash: '\\>',
-  flash_end: '\\<'
+  flash_end: '\\<',
+  speed: '\\S'
 };
 
 const cNoEndTags = ['br', 'stop', 'wait', 'q_wait', 'close'];
