@@ -1,5 +1,6 @@
 import ScenarioBlock from './scenario-block';
 import Message from './message';
+import System from './system';
 import MessageBlock from './message-block';
 import Config from './config';
 import TbSerializer from './tb-serializer';
@@ -23,6 +24,8 @@ export default class ScenarioParser {
     this.serializer = new TbSerializer(this.config);
     this.jsSerializer = new JsSerializer(this.config);
     this.parsedMessages = false;
+    this.currentSystemId = 0;
+    this.systemList = ['default'];
   }
   parse(input) {
     // trimと配列化
@@ -118,14 +121,17 @@ export default class ScenarioParser {
       isBeforeComment = false;
       // 改ページ判定
       let isPageBreak = false;
-      if (/^<pb>/.test(text)) {
+      // pb・systemタグによる改ページ
+      const pbTagMatch = text.match(/(^|[^\\])(<pb>|<system( name=[^ ]+|) \/>)/);
+      const pbTag = pbTagMatch ? pbTagMatch[2] : null;
+      if (pbTagMatch !== null) {
+        const pbTagIndex = pbTagMatch.index;
         isPageBreak = true;
-        text = '';  // 文字表示無し
-      } else if (/[^\\]<pb>/.test(text)) {
-        isPageBreak = true;
-        // pbタグ以降の文字列を削除
-        const pbIndex = text.search(/[^\\]<pb>/) + 1;
-        text = text.substr(0, pbIndex);
+        if (pbTagIndex === 0) {
+          text = '';
+        } else {
+          text = text.substr(0, pbTagIndex + 1);
+        }
       }
       tmp.push(text);
       if (tmp.length == this.config.lineLimit + (block.face ? -1 : 0)) {
@@ -135,6 +141,9 @@ export default class ScenarioParser {
         block.addMessage(this._tagFormat(tmp, comments));
         tmp = [];
         comments = [];
+        if (pbTag && pbTag.startsWith('<system')) {
+          block.addMessage(this._parseSystemTag(pbTag));
+        }
       }
     });
     if (tmp.length > 0) {
@@ -145,6 +154,12 @@ export default class ScenarioParser {
     }
 
     return result;
+  }
+
+  _parseSystemTag(pbTag) {
+    const nameMatch = pbTag.match(/name=['"]([^'"]+)['"]/);
+    const name = nameMatch ? nameMatch[1] : false;
+    return new System(name);
   }
 
   _tagFormat(textList, comments) {

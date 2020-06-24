@@ -62,6 +62,10 @@ export default class TbSerializer {
         result.push('Faice(0, 0, 0)');
       }
       messageBlock.messageList.forEach((message) => {
+        if (message.type == 'command') {
+          result.push(message.serialize());
+          return;
+        }
         // コメント行の出力
         message.comments.forEach((comment) => {
           result.push(`Note("${comment}")`);
@@ -104,14 +108,13 @@ export default class TbSerializer {
         const tagData = part.substr(1, part.length - 2).split(' ');
         const tagName = tagData.shift();
         if (tagName ==='speed') {
-          console.log(text, tagName, tagData);
           // スピードタグ
-          const value = tagData.find((v) => {
+          const speedValue = tagData.find((v) => {
             return v.includes('value=');
           }).match(/[0-9]+/)[0];
           this.speedStack.push(prevSpeed);
-          prevSpeed = value;
-          return `${cChar.speed}[${value}]`;
+          prevSpeed = speedValue;
+          return `${cChar.speed}[${speedValue}]`;
         }
         const colorNumber = this.config.getColorNumber(tagName);
         if (colorNumber) {
@@ -168,7 +171,8 @@ const cChar = {
   close: '\\^',
   flash: '\\>',
   flash_end: '\\<',
-  speed: '\\S'
+  speed: '\\S',
+  system: ''
 };
 
 const cNoEndTags = ['br', 'stop', 'wait', 'q_wait', 'close'];

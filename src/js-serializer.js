@@ -62,6 +62,10 @@ export default class JsSerializer {
         result.push('tkMock.raw(`Faice(0, 0, 0)`);');
       }
       messageBlock.messageList.forEach((message) => {
+        if (message.type === 'command') {
+          result.push(`tkMock.raw(\`${message.serialize()}\`)`);
+          return;
+        }
         // コメント行の出力
         message.comments.forEach((comment) => {
           // コメントはJavaScriptのコメントとして出力する
@@ -104,14 +108,14 @@ export default class JsSerializer {
         // 開始タグ
         const tagData = part.substr(1, part.length - 2).split(' ');
         const tagName = tagData.shift();
-        if (tagName ==='speed') {
+        if (tagName === 'speed') {
           // スピードタグ
-          const value = tagData.find((v) => {
+          const speedValue = tagData.find((v) => {
             return v.includes('value=');
           }).match(/[0-9]+/)[0];
           this.speedStack.push(prevSpeed);
-          prevSpeed = value;
-          return `${cChar.speed}[${value}]`;
+          prevSpeed = speedValue;
+          return `${cChar.speed}[${speedValue}]`;
         }
         const colorNumber = this.config.getColorNumber(tagName);
         if (colorNumber) {
