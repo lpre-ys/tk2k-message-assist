@@ -6,7 +6,13 @@ export default class Config {
     this._config = {
       color: {},
       style: {},
-      face: {}
+      face: {},
+      system: {
+        default: {
+          filename: 'system',
+          tkName: 'システム'
+        }
+      }
     };
   }
 
@@ -86,12 +92,21 @@ export default class Config {
     return ret;
   }
 
+  getSystem(label) {
+    console.log('TEST', this._config.system);
+    return this._config.system[label] ? this._config.system[label] : false;
+  }
+
   loadStyleYaml(yaml) {
     const yamlObj = jsyaml.load(yaml);
     // 色設定はそのまま読み込む
     this._config.color = yamlObj.color ? yamlObj.color : false;
     // スタイル設定はそのまま読み込む
     this._config.style = yamlObj.style ? yamlObj.style : false;
+    // System設定が有れば上書き
+    if (yamlObj.system) {
+      this._config.system = yamlObj.system;
+    }
     // 顔設定の初期化
     this._config.face = {};
   }

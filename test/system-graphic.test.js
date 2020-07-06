@@ -27,7 +27,8 @@ describe('SystemGraphic', () => {
       assert.ok(block.messageList[0] instanceof Message);
       assert.deepEqual(block.messageList[0].line, ['1行目']);
       assert.ok(block.messageList[1] instanceof System);
-      assert.deepEqual(block.messageList[1].filename, 'システム');
+      assert.deepEqual(block.messageList[1].filename, 'system');
+      assert.deepEqual(block.messageList[1].tkName, 'システム');
       assert.ok(block.messageList[2] instanceof Message);
       assert.deepEqual(block.messageList[2].line, ['2行目', '3行目']);
     });
@@ -42,24 +43,19 @@ describe('SystemGraphic', () => {
       assert.ok(block.messageList[0] instanceof Message);
       assert.deepEqual(block.messageList[0].line, ['1行目']);
       assert.ok(block.messageList[1] instanceof System);
-      assert.deepEqual(block.messageList[1].filename, 'test');
+      assert.deepEqual(block.messageList[1].filename, 'testfile');
+      assert.deepEqual(block.messageList[1].tkName, 'テスト');
       assert.ok(block.messageList[2] instanceof Message);
       assert.deepEqual(block.messageList[2].line, ['2行目', '3行目']);
     });
-    it('日本語ファイル名も指定できること', () => {
+    it('configに存在しないnameの場合、エラーとなること', () => {
       const text = `1行目
-      <system name='てすと_test-01234' />
+      <system name='test2' />
       2行目
       3行目`;
-      const ret = parser.parse(text);
-      const block = ret.child[0][0];
-      assert.equal(block.face, false);
-      assert.ok(block.messageList[0] instanceof Message);
-      assert.deepEqual(block.messageList[0].line, ['1行目']);
-      assert.ok(block.messageList[1] instanceof System);
-      assert.deepEqual(block.messageList[1].filename, 'てすと_test-01234');
-      assert.ok(block.messageList[2] instanceof Message);
-      assert.deepEqual(block.messageList[2].line, ['2行目', '3行目']);
+      assert.throws(() => {
+        parser.parse(text);
+      }, new Error('存在しないsystemです: test2'));
     });
   });
   describe('JsSerializer', () => {
@@ -76,10 +72,13 @@ describe('SystemGraphic', () => {
       // create instance
       serializer = new JsSerializer(config);
     });
-    it('no name Tag', () => {
+    it('default System', () => {
       const messageBlock = new MessageBlock();
       messageBlock.addMessage(new Message(['TestMessage1']));
-      messageBlock.addMessage(new System());
+      messageBlock.addMessage(new System('default', {
+        tkName: 'システム',
+        filename: 'system'
+      }));
       messageBlock.addMessage(new Message(['TestMessage2']));
       const root = new ScenarioBlock(0);
       root.child.push([messageBlock]);
@@ -93,7 +92,10 @@ tkMock.raw(\`Text("TestMessage2")\`);`);
     it('set Alphanumeric name', () => {
       const messageBlock = new MessageBlock();
       messageBlock.addMessage(new Message(['TestMessage1']));
-      messageBlock.addMessage(new System('test-42'));
+      messageBlock.addMessage(new System('test', {
+        tkName: 'test-42',
+        filename: 'test-42-name'
+      }));
       messageBlock.addMessage(new Message(['TestMessage2']));
       const root = new ScenarioBlock(0);
       root.child.push([messageBlock]);
@@ -107,7 +109,10 @@ tkMock.raw(\`Text("TestMessage2")\`);`);
     it('set Multibyte name', () => {
       const messageBlock = new MessageBlock();
       messageBlock.addMessage(new Message(['TestMessage1']));
-      messageBlock.addMessage(new System('テストファイル名'));
+      messageBlock.addMessage(new System('test', {
+        tkName: 'テストファイル名',
+        filename: 'てすと'
+      }));
       messageBlock.addMessage(new Message(['TestMessage2']));
       const root = new ScenarioBlock(0);
       root.child.push([messageBlock]);
@@ -133,10 +138,13 @@ tkMock.raw(\`Text("TestMessage2")\`);`);
       // create instance
       serializer = new TbSerializer(config);
     });
-    it('no name Tag', () => {
+    it('default System tag', () => {
       const messageBlock = new MessageBlock();
       messageBlock.addMessage(new Message(['TestMessage1']));
-      messageBlock.addMessage(new System());
+      messageBlock.addMessage(new System('default', {
+        tkName: 'システム',
+        filename: 'system'
+      }));
       messageBlock.addMessage(new Message(['TestMessage2']));
       const root = new ScenarioBlock(0);
       root.child.push([messageBlock]);

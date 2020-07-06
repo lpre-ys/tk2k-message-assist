@@ -25,7 +25,6 @@ export default class ScenarioParser {
     this.jsSerializer = new JsSerializer(this.config);
     this.parsedMessages = false;
     this.currentSystemId = 0;
-    this.systemList = ['default'];
   }
   parse(input) {
     // trimと配列化
@@ -158,8 +157,12 @@ export default class ScenarioParser {
 
   _parseSystemTag(pbTag) {
     const nameMatch = pbTag.match(/name=['"]([^'"]+)['"]/);
-    const name = nameMatch ? nameMatch[1] : false;
-    return new System(name);
+    const name = nameMatch ? nameMatch[1] : 'default';
+    const systemConfig = this.config.getSystem(name);
+    if (!systemConfig) {
+      throw new Error(`存在しないsystemです: ${name}`);
+    }
+    return new System(name, systemConfig);
   }
 
   _tagFormat(textList, comments) {
