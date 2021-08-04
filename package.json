@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "js-yaml": "^3.6.1",
-    "xmldom": "^0.1.22"
+    "xmldom": "^0.6.0"
   }
 }
