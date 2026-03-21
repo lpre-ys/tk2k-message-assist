@@ -262,6 +262,28 @@ describe('ScenarioParser', () => {
             assert.deepEqual(block.messageList[2].line, ['Normal message 3']);
           });
         });
+        describe('center tag', () => {
+          it('2行・同一ウィンドウ', () => {
+            const text = `<center>1行目
+            2行目</center>`;
+            const ret = parser.parse(text);
+
+            const block = ret.child[0][0];
+            assert.equal(block.face, false);
+            assert.deepEqual(block.messageList[0].line, ['<center>1行目', '2行目</center>']);
+          });
+          it('3行・ウィンドウ跨ぎ', () => {
+            const text = `<center>1行目
+            2行目
+            3行目</center>`;
+            const ret = parser.parse(text);
+
+            const block = ret.child[0][0];
+            assert.equal(block.face, false);
+            assert.deepEqual(block.messageList[0].line, ['<center>1行目', '2行目</center>']);
+            assert.deepEqual(block.messageList[1].line, ['<center>3行目</center>']);
+          });
+        });
       });
     });
   });

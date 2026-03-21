@@ -74,8 +74,11 @@ export default class JsSerializer {
         // タグ置換
         this.colorStack = []; // 色タグのスタックリセット
         this.speedStack = [];
-        let line = message.line.map((text)=> {
-          return this._toTbScript(text);
+        let inCenter = false;
+        let line = message.line.map((text) => {
+          const { padding, inner, nextInCenter } = this._extractCenter(text, showFace, inCenter);
+          inCenter = nextInCenter;
+          return padding + this._toTbScript(inner);
         });
 
         // 改行を置換してまとめる
@@ -125,6 +128,7 @@ export default class JsSerializer {
           return `${cChar.color}[${colorNumber}]`;
         }
         // 制御タグ
+        if (cEmptyTags.includes(tagName)) return '';
         return `${this._getCChar(tagName)}`;
       } else if (/^<\/[a-z\-_]+>$/.test(part)) {
         // 閉じタグ
@@ -143,6 +147,8 @@ export default class JsSerializer {
         } else if (cNoEndTags.includes(tagName)) {
           // 閉じタグが無いタグの場合、空
           return '';
+        } else if (cEmptyTags.includes(tagName)) {
+          return '';
         }
       }
       // タグ以外のテキストの場合、エスケープ文字を消す
@@ -152,7 +158,7 @@ export default class JsSerializer {
   }
 
   _getCChar(name) {
-    if (!cChar[name]) {
+    if (cChar[name] === undefined) {
       throw new Error(`対応していないタグです。: ${name}`);
     }
     return cChar[name];
@@ -160,6 +166,67 @@ export default class JsSerializer {
 
   _removeEscapeChar(text) {
     return text.replace(/([^\\]?)\\/, '$1').replace('\\', '\\\\');
+  }
+
+  _extractCenter(text, hasFace, inCenter = false) {
+    // 1行全体: (開始タグ群)<center>内容</center>(閉じタグ群)
+    const fullMatch = text.match(
+      /^((?:<[a-z][a-z0-9\-_]*(?:\s[^>]*)?>)*)<center>([\s\S]*?)<\/center>((?:<\/[a-z][a-z0-9\-_]*>)*)$/
+    );
+    if (fullMatch) {
+      const [, lead, inner, trail] = fullMatch;
+      return { padding: this._calcCenterPadding(inner, hasFace), inner: lead + inner + trail, nextInCenter: false };
+    }
+    // center ブロックの開始: (開始タグ群)<center>テキスト（</center>なし）
+    if (!inCenter && !text.includes('</center>')) {
+      const startMatch = text.match(
+        /^((?:<[a-z][a-z0-9\-_]*(?:\s[^>]*)?>)*)<center>([\s\S]*)$/
+      );
+      if (startMatch) {
+        const [, lead, afterCenter] = startMatch;
+        return { padding: this._calcCenterPadding(afterCenter, hasFace), inner: lead + afterCenter, nextInCenter: true };
+      }
+    }
+    // center ブロックの内側（中間行）
+    if (inCenter && !text.includes('</center>')) {
+      return { padding: this._calcCenterPadding(text, hasFace), inner: text, nextInCenter: true };
+    }
+    // center ブロックの終了: テキスト</center>(閉じタグ群)
+    if (inCenter) {
+      const endMatch = text.match(/^([\s\S]*?)<\/center>((?:<\/[a-z][a-z0-9\-_]*>)*)$/);
+      if (endMatch) {
+        const [, beforeCenter, trail] = endMatch;
+        return { padding: this._calcCenterPadding(beforeCenter, hasFace), inner: beforeCenter + trail, nextInCenter: false };
+      }
+    }
+    // フォールバック：行途中にテキストがある center タグ等
+    return { padding: '', inner: text, nextInCenter: false };
+  }
+
+  _calcCenterPadding(inner, hasFace) {
+    const lineWidth = hasFace ? 76 : 100; // QW単位
+    const textWidth = this._visibleWidthQw(this._stripTagsForWidth(inner));
+    const leftPad = Math.floor((lineWidth - textWidth) / 2);
+    if (leftPad <= 0) return '';
+    const fullWidthCount = Math.floor(leftPad / 4);
+    const remainder = leftPad % 4;
+    const halfWidthCount = Math.floor(remainder / 2);
+    const quarterWidthCount = remainder % 2;
+    return '　'.repeat(fullWidthCount) + ' '.repeat(halfWidthCount) + '\\_'.repeat(quarterWidthCount);
+  }
+
+  _stripTagsForWidth(text) {
+    return text.replace(/<\/?[a-z0-9\-_ ='"]+>/g, '');
+  }
+
+  _visibleWidthQw(text) {
+    return [...text].reduce((sum, ch) => {
+      const code = ch.charCodeAt(0);
+      if ((code >= 0x20 && code <= 0x7E) || (code >= 0xFF61 && code <= 0xFF9F)) {
+        return sum + 2; // 半角 = 2QW
+      }
+      return sum + 4; // 全角 = 4QW
+    }, 0);
   }
 }
 
@@ -172,8 +239,10 @@ const cChar = {
   close: '\\^',
   flash: '\\>',
   flash_end: '\\<',
-  speed: '\\S'
+  speed: '\\S',
+  center: ''
 };
 
 const cNoEndTags = ['br', 'stop', 'wait', 'q_wait', 'close'];
 const cNormalTags = ['flash'];
+const cEmptyTags = ['center'];
