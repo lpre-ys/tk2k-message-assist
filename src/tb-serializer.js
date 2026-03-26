@@ -5,6 +5,8 @@ export default class TbSerializer {
     this.config = config;
     this.colorStack = [];
     this.speedStack = [];
+    this.prevColor = 0;
+    this.prevSpeed = 0;
   }
 
   serialize(root, option = {}) {
@@ -73,6 +75,8 @@ export default class TbSerializer {
         // タグ置換
         this.colorStack = []; // 色タグのスタックリセット
         this.speedStack = [];
+        this.prevColor = 0;
+        this.prevSpeed = 0;
         let inCenter = false;
         let line = message.line.map((text) => {
           const { padding, inner, nextInCenter } = this._extractCenter(text, showFace, inCenter);
@@ -103,8 +107,6 @@ export default class TbSerializer {
       return this._removeEscapeChar(text);
     }
     // タグの変換
-    let prevColor = 0;
-    let prevSpeed = 0;
     parts = parts.map((part) => {
       if (/^<[a-z0-9\-_ ='"]+>$/.test(part)) {
         // 開始タグ
@@ -115,15 +117,15 @@ export default class TbSerializer {
           const speedValue = tagData.find((v) => {
             return v.includes('value=');
           }).match(/[0-9]+/)[0];
-          this.speedStack.push(prevSpeed);
-          prevSpeed = speedValue;
+          this.speedStack.push(this.prevSpeed);
+          this.prevSpeed = speedValue;
           return `${cChar.speed}[${speedValue}]`;
         }
         const colorNumber = this.config.getColorNumber(tagName);
         if (colorNumber) {
           // 色タグ
-          this.colorStack.push(prevColor);
-          prevColor = colorNumber;
+          this.colorStack.push(this.prevColor);
+          this.prevColor = colorNumber;
           return `${cChar.color}[${colorNumber}]`;
         }
         // 制御タグ
@@ -134,12 +136,12 @@ export default class TbSerializer {
         const tagName = part.substr(2, part.length - 3);
         if (!this.config.getColorNumber(tagName) === false) {
           // 色タグ
-          prevColor = this.colorStack.pop();
-          return `${cChar.color}[${prevColor}]`;
+          this.prevColor = this.colorStack.pop();
+          return `${cChar.color}[${this.prevColor}]`;
         } else if (tagName === 'speed') {
           // スピードタグ
-          prevSpeed = this.speedStack.pop();
-          return `${cChar.speed}[${prevSpeed}]`;
+          this.prevSpeed = this.speedStack.pop();
+          return `${cChar.speed}[${this.prevSpeed}]`;
         }else if (cNormalTags.includes(tagName)) {
           // 閉じタグ有りの制御タグ
           return `${this._getCChar(tagName + '_end')}`;

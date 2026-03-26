@@ -152,6 +152,16 @@ tkMock.raw(\`Text("normal\\\\C[3]yellow\\\\C[4]red\\\\C[3]\\\\C[0]normal")\`);`)
         assert(ret == `tkMock.raw(\`Faice(0, 0, 0)\`);
 tkMock.raw(\`Text("Test message \\\\C[4]RED-START\\\\kTest message 2 RED-END\\\\C[0] normal message")\`);`);
       });
+      it('ネストタグが複数行にまたがる', () => {
+        const messageBlock = new MessageBlock();
+        messageBlock.addMessage(new Message(['<red>赤文字', '<yellow>黄色文字</yellow>赤文字</red>']));
+        const root = new ScenarioBlock(0);
+        root.child.push([messageBlock]);
+        const ret = serializer.serialize(root);
+
+        assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("\\\\C[4]赤文字\\\\k\\\\C[3]黄色文字\\\\C[4]赤文字\\\\C[0]")\`);`);
+      });
     });
     describe('control tag', () => {
       it('stop', () => {
