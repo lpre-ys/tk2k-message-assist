@@ -63,6 +63,9 @@ export default class JsSerializer {
         // 顔グラを非表示に
         result.push('tkMock.raw(`Faice(0, 0, 0)`);');
       }
+      if (messageBlock.se) {
+        result.push(`tkMock.raw(\`PlaySE("${messageBlock.se}", 100, 100, 50)\`);`);
+      }
       messageBlock.messageList.forEach((message) => {
         if (message.type === 'command') {
           result.push(`tkMock.raw(\`${message.serialize()}\`)`);

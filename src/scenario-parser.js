@@ -98,7 +98,13 @@ export default class ScenarioParser {
       }
       if (this.config.hasFace && faceCommandRegExp.test(text)) {
         // 顔グラ変更
-        const faceCommand = text.substr(1, text.length -2);
+        let faceCommand = text.substr(1, text.length -2);
+        let se = null;
+        const seMatch = faceCommand.match(/\s+se=(\S+)$/i);
+        if (seMatch) {
+          se = seMatch[1];
+          faceCommand = faceCommand.slice(0, seMatch.index);
+        }
         const faceConfig = this.config.getFace(faceCommand);
         // メッセージブロックの作り直し
         if (tmp.length > 0) {
@@ -115,6 +121,7 @@ export default class ScenarioParser {
           result.push(block);
         }
         block = new MessageBlock(faceConfig);
+        block.se = se;
         return; //continue
       }
       isBeforeComment = false;

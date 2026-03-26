@@ -3,6 +3,7 @@ import Const from './const';
 export default class MessageBlock {
   constructor(face) {
     this.face = face || false;
+    this.se = null;
     this.messageList = [];
   }
   addMessage(message) {

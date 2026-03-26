@@ -63,6 +63,9 @@ export default class TbSerializer {
         // 顔グラを非表示に
         result.push('Faice(0, 0, 0)');
       }
+      if (messageBlock.se) {
+        result.push(`PlaySE("${messageBlock.se}", 100, 100, 50)`);
+      }
       messageBlock.messageList.forEach((message) => {
         if (message.type == 'command') {
           result.push(message.serialize());
