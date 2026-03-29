@@ -28,7 +28,7 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-power-assert": "^3.0.0",
     "babel-register": "^6.26.0",
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "power-assert": "^1.6.1"
   },
   "dependencies": {
