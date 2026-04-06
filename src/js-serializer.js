@@ -82,10 +82,18 @@ export default class JsSerializer {
         this.prevColor = 0;
         this.prevSpeed = 0;
         let inCenter = false;
+        let inRight = false;
         let line = message.line.map((text) => {
-          const { padding, inner, nextInCenter } = this._extractCenter(text, showFace, inCenter);
-          inCenter = nextInCenter;
-          return padding + this._toTbScript(inner);
+          const centerResult = this._extractCenter(text, showFace, inCenter);
+          const wasInCenter = inCenter;
+          inCenter = centerResult.nextInCenter;
+          if (wasInCenter || centerResult.nextInCenter || centerResult.inner !== text) {
+            inRight = false;
+            return centerResult.padding + this._toTbScript(centerResult.inner);
+          }
+          const rightResult = this._extractRight(text, showFace, inRight);
+          inRight = rightResult.nextInRight;
+          return rightResult.padding + this._toTbScript(rightResult.inner);
         });
 
         // 改行を置換してまとめる
@@ -220,6 +228,53 @@ export default class JsSerializer {
     return '　'.repeat(fullWidthCount) + ' '.repeat(halfWidthCount) + '\\_'.repeat(quarterWidthCount);
   }
 
+  _extractRight(text, hasFace, inRight = false) {
+    // 1行全体: (開始タグ群)<right>内容</right>(閉じタグ群)
+    const fullMatch = text.match(
+      /^((?:<[a-z][a-z0-9\-_]*(?:\s[^>]*)?>)*)<right>([\s\S]*?)<\/right>((?:<\/[a-z][a-z0-9\-_]*>)*)$/
+    );
+    if (fullMatch) {
+      const [, lead, inner, trail] = fullMatch;
+      return { padding: this._calcRightPadding(inner, hasFace), inner: lead + inner + trail, nextInRight: false };
+    }
+    // right ブロックの開始: (開始タグ群)<right>テキスト（</right>なし）
+    if (!inRight && !text.includes('</right>')) {
+      const startMatch = text.match(
+        /^((?:<[a-z][a-z0-9\-_]*(?:\s[^>]*)?>)*)<right>([\s\S]*)$/
+      );
+      if (startMatch) {
+        const [, lead, afterRight] = startMatch;
+        return { padding: this._calcRightPadding(afterRight, hasFace), inner: lead + afterRight, nextInRight: true };
+      }
+    }
+    // right ブロックの内側（中間行）
+    if (inRight && !text.includes('</right>')) {
+      return { padding: this._calcRightPadding(text, hasFace), inner: text, nextInRight: true };
+    }
+    // right ブロックの終了: テキスト</right>(閉じタグ群)
+    if (inRight) {
+      const endMatch = text.match(/^([\s\S]*?)<\/right>((?:<\/[a-z][a-z0-9\-_]*>)*)$/);
+      if (endMatch) {
+        const [, beforeRight, trail] = endMatch;
+        return { padding: this._calcRightPadding(beforeRight, hasFace), inner: beforeRight + trail, nextInRight: false };
+      }
+    }
+    // フォールバック：行途中にテキストがある right タグ等
+    return { padding: '', inner: text, nextInRight: false };
+  }
+
+  _calcRightPadding(inner, hasFace) {
+    const lineWidth = hasFace ? 76 : 100; // QW単位
+    const textWidth = this._visibleWidthQw(this._stripTagsForWidth(inner));
+    const leftPad = lineWidth - textWidth;
+    if (leftPad <= 0) return '';
+    const fullWidthCount = Math.floor(leftPad / 4);
+    const remainder = leftPad % 4;
+    const halfWidthCount = Math.floor(remainder / 2);
+    const quarterWidthCount = remainder % 2;
+    return '　'.repeat(fullWidthCount) + ' '.repeat(halfWidthCount) + '\\_'.repeat(quarterWidthCount);
+  }
+
   _stripTagsForWidth(text) {
     return text.replace(/<\/?[a-z0-9\-_ ='"]+>/g, '');
   }
@@ -245,9 +300,10 @@ const cChar = {
   flash: '\\>',
   flash_end: '\\<',
   speed: '\\S',
-  center: ''
+  center: '',
+  right: ''
 };
 
 const cNoEndTags = ['br', 'stop', 'wait', 'q_wait', 'close'];
 const cNormalTags = ['flash'];
-const cEmptyTags = ['center'];
+const cEmptyTags = ['center', 'right'];

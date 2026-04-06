@@ -341,6 +341,59 @@ tkMock.raw(\`Text("\\\\C[3]あああテスト\\\\C[0]")\`);`);
 tkMock.raw(\`Text("\\\\C[3]【テスト１】\\\\C[0]\\\\k　　　　　　　　あいう\\\\k　　　　　　　　えおか")\`);`);
     });
   });
+  describe('right tag', () => {
+    it('全角テキスト', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>こんにちは</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // textWidth=20QW, leftPad=80QW → 全角SP×20
+      assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("　　　　　　　　　　　　　　　　　　　　こんにちは")\`);`);
+    });
+    it('ハーフスペースを含む場合、バックスラッシュが正しくエスケープされる', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>Hello</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // textWidth=10QW, leftPad=90QW → 全角SP×22 + 半角SP×1
+      assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("　　　　　　　　　　　　　　　　　　　　　　 Hello")\`);`);
+    });
+    it('行の途中のrightタグはフォールバックでタグが無視される', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['普通<right>右寄せ</right>後ろ']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("普通右寄せ後ろ")\`);`);
+    });
+    it('複数行にわたるright', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>あいう', 'えおか</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // あいう/えおか: 12QW, leftPad=88QW → 全角SP×22
+      assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("　　　　　　　　　　　　　　　　　　　　　　あいう\\\\k　　　　　　　　　　　　　　　　　　　　　　えおか")\`);`);
+    });
+    it('ウィンドウ跨ぎright', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>あいう', 'えおか</right>']));
+      messageBlock.addMessage(new Message(['<right>かきく</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // 全行: 12QW, leftPad=88QW → 全角SP×22
+      assert.equal(ret, `tkMock.raw(\`Faice(0, 0, 0)\`);
+tkMock.raw(\`Text("　　　　　　　　　　　　　　　　　　　　　　あいう\\\\k　　　　　　　　　　　　　　　　　　　　　　えおか")\`);
+tkMock.raw(\`Text("　　　　　　　　　　　　　　　　　　　　　　かきく")\`);`);
+    });
+  });
   describe('シナリオブロック有り', () => {
     describe('ネスト無し', () => {
       it('1block', () => {

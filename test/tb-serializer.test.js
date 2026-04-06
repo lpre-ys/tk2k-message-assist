@@ -384,6 +384,63 @@ Text("normal\\S[10]speed10\\S[20]speed20\\S[10]speed10\\S[0]normal")`);
       assert.equal(ret, `Faice("test1.png", 1, 0, 0)\nText("\\C[3]【テスト１】\\C[0]\\k　　　　　　　　あいう\\k　　　　　　　　えおか")`);
     });
   });
+  describe('right tag', () => {
+    it('顔グラなし・全角テキスト', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>こんにちは</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // textWidth=20QW, leftPad=80QW → 全角SP×20
+      assert.equal(ret, `Faice(0, 0, 0)\nText("　　　　　　　　　　　　　　　　　　　　こんにちは")`);
+    });
+    it('顔グラなし・半角テキスト', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>Hello</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // textWidth=10QW, leftPad=90QW → 全角SP×22 + 半角SP×1
+      assert.equal(ret, `Faice(0, 0, 0)\nText("　　　　　　　　　　　　　　　　　　　　　　 Hello")`);
+    });
+    it('顔グラあり', () => {
+      const faceConfig = config.getFace('テスト君_普通');
+      const messageBlock = new MessageBlock(faceConfig);
+      messageBlock.addMessage(new Message(['<right>テスト</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // lineWidth=76QW, textWidth=12QW, leftPad=64QW → 全角SP×16
+      assert.equal(ret, `Faice("test1.png", 1, 0, 0)\nText("\\C[3]【テスト１】\\C[0]\\k　　　　　　　　　　　　　　　　テスト")`);
+    });
+    it('行の途中のrightタグはフォールバックでタグが無視される', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['普通<right>右寄せ</right>後ろ']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      assert.equal(ret, `Faice(0, 0, 0)\nText("普通右寄せ後ろ")`);
+    });
+    it('複数行にわたるright', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>あいう', 'えおか</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // あいう/えおか: 12QW, leftPad=88QW → 全角SP×22
+      assert.equal(ret, `Faice(0, 0, 0)\nText("　　　　　　　　　　　　　　　　　　　　　　あいう\\k　　　　　　　　　　　　　　　　　　　　　　えおか")`);
+    });
+    it('ウィンドウ跨ぎright', () => {
+      const messageBlock = new MessageBlock();
+      messageBlock.addMessage(new Message(['<right>あいう', 'えおか</right>']));
+      messageBlock.addMessage(new Message(['<right>かきく</right>']));
+      const root = new ScenarioBlock(0);
+      root.child.push([messageBlock]);
+      const ret = serializer.serialize(root);
+      // 全行: 12QW, leftPad=88QW → 全角SP×22
+      assert.equal(ret, `Faice(0, 0, 0)\nText("　　　　　　　　　　　　　　　　　　　　　　あいう\\k　　　　　　　　　　　　　　　　　　　　　　えおか")\nText("　　　　　　　　　　　　　　　　　　　　　　かきく")`);
+    });
+  });
   describe('シナリオブロック有り', () => {
     describe('ネスト無し', () => {
       it('1block', () => {
