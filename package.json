@@ -32,7 +32,6 @@
     "power-assert": "^1.6.1"
   },
   "dependencies": {
-    "js-yaml": "^3.6.1",
-    "xmldom": "^0.1.22"
+    "js-yaml": "^3.6.1"
   }
 }
