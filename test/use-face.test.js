@@ -1,6 +1,6 @@
-import assert from 'power-assert';
+import assert from 'assert';
 import fs from 'fs';
-import ScenarioParser from '../src/scenario-parser';
+import ScenarioParser from '../src/scenario-parser.js';
 
 describe('ScenarioParser', () => {
   let parser;

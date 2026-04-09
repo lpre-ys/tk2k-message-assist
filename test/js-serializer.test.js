@@ -1,10 +1,10 @@
-import assert from 'power-assert';
+import assert from 'assert';
 import fs from 'fs';
-import JsSerializer from '../src/js-serializer';
-import Config from '../src/config';
-import MessageBlock from '../src/message-block';
-import Message from '../src/message';
-import ScenarioBlock from '../src/scenario-block';
+import JsSerializer from '../src/js-serializer.js';
+import Config from '../src/config.js';
+import MessageBlock from '../src/message-block.js';
+import Message from '../src/message.js';
+import ScenarioBlock from '../src/scenario-block.js';
 
 describe('JsSerializer', () => {
   let serializer;

@@ -1,5 +1,5 @@
-import assert from 'power-assert';
-import Config from '../src/config';
+import assert from 'assert';
+import Config from '../src/config.js';
 import fs from 'fs';
 
 describe('Config', () => {

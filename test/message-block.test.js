@@ -1,5 +1,5 @@
-import assert from 'power-assert';
-import MessageBlock from '../lib/message-block';
+import assert from 'assert';
+import MessageBlock from '../src/message-block.js';
 
 describe('MessageBlock', () => {
   it('hasMessage true', () => {

@@ -1,4 +1,4 @@
-import Const from './const';
+import Const from './const.js';
 
 export default class ScenarioBlock {
   constructor(no, parentBlock = false, label = false) {

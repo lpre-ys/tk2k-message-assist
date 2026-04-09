@@ -1,10 +1,10 @@
-import ScenarioBlock from './scenario-block';
-import Message from './message';
-import System from './system';
-import MessageBlock from './message-block';
-import Config from './config';
-import TbSerializer from './tb-serializer';
-import JsSerializer from './js-serializer';
+import ScenarioBlock from './scenario-block.js';
+import Message from './message.js';
+import System from './system.js';
+import MessageBlock from './message-block.js';
+import Config from './config.js';
+import TbSerializer from './tb-serializer.js';
+import JsSerializer from './js-serializer.js';
 
 // ブロック構文チェック用正規表現
 const blockRegExpStr = '(?:^{|^(.*[^\\\\])\\{)';

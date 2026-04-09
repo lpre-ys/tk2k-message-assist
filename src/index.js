@@ -1,5 +1,1 @@
-import ScenarioParser from './scenario-parser';
-
-module.exports = {
-  ScenarioParser
-};
+export { default as ScenarioParser } from './scenario-parser.js';
