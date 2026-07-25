@@ -1,4 +1,4 @@
-import jsyaml from 'js-yaml';
+import * as jsyaml from 'js-yaml';
 import Const from './const.js';
 
 export default class Config {
