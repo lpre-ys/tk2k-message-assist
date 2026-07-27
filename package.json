@@ -24,7 +24,7 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "mocha": "^11.7.5"
+    "mocha": "^11.7.6"
   },
   "dependencies": {
     "js-yaml": "^5.2.2"
